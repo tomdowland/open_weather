@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:open_weather/views/home_page.dart';
-import 'package:open_weather/views/search_page.dart';
 import 'package:open_weather/views/settings_page.dart';
 
 final GoRouter _router = GoRouter(
@@ -13,12 +12,6 @@ final GoRouter _router = GoRouter(
         return const HomePage();
       },
       routes: <RouteBase>[
-        GoRoute(
-          path: 'search',
-          builder: (context, state) {
-            return const SearchPage();
-          },
-        ),
         GoRoute(
           path: 'settings',
           builder: (context, state) {

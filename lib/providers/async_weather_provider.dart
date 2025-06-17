@@ -3,7 +3,7 @@ import 'package:open_weather/repositories/weather_repository.dart';
 import 'package:open_weather/services/weather_api_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'weather_provider.g.dart';
+part 'async_weather_provider.g.dart';
 
 // Provider for the API Service (remains a regular Provider)
 final weatherApiService = Provider((ref) => WeatherApiService());
@@ -16,7 +16,7 @@ final weatherRepositoryProvider = Provider((ref) {
 
 // AsyncNotifier for managing the weather state using Riverpod code generation
 @riverpod
-class WeatherNotifier extends _$WeatherNotifier {
+class AsyncWeather extends _$AsyncWeather {
   @override
   Future<FullResult?> build() async {
     // Attempt to fetch current location weather on startup
@@ -84,22 +84,20 @@ class WeatherNotifier extends _$WeatherNotifier {
   // }
 
   // Method to fetch weather by city name (can be triggered by user input)
-  Future<void> fetchWeatherByCity(String city) async {
+  Future<FullResult?> fetchWeatherByCity(String city) async {
     state = const AsyncValue.loading();
     try {
       final repository = ref.read(weatherRepositoryProvider);
       final weather = await repository.getWeather(city);
       final forecast = await repository.getForecast(city);
-      state = AsyncValue.data(
-        FullResult(
-          city: weather?.city,
-          country: weather?.country,
-          weather: weather?.weather,
-          temperature: weather?.temperature,
-          dateTime: weather?.dateTime,
-          icon: weather?.icon,
-          forecast: forecast,
-        ),
+      return FullResult(
+        city: weather?.city,
+        country: weather?.country,
+        weather: weather?.weather,
+        temperature: weather?.temperature,
+        dateTime: weather?.dateTime,
+        icon: weather?.icon,
+        forecast: forecast,
       );
     } catch (e, st) {
       state = AsyncValue.error(e, st);
