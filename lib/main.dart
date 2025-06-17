@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:open_weather/meta/theme.dart';
+import 'package:open_weather/providers/settings_provider.dart';
 import 'package:open_weather/views/home_page.dart';
 import 'package:open_weather/views/settings_page.dart';
 
@@ -33,6 +35,12 @@ class MyApp extends ConsumerWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return MaterialApp.router(routerConfig: _router);
+    final settings = ref.watch(settingsNotifierProvider);
+    return MaterialApp.router(
+      routerConfig: _router,
+      theme: lightTheme,
+      darkTheme: darkTheme,
+      themeMode: settings.darkMode ? ThemeMode.dark : ThemeMode.light,
+    );
   }
 }

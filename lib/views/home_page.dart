@@ -16,6 +16,7 @@ class HomePage extends HookConsumerWidget {
       appBar: AppBar(
         title: weather.editing
             ? TextField(
+                autofocus: true,
                 onSubmitted: ref
                     .read(homePageNotifierProvider.notifier)
                     .searchCity,
