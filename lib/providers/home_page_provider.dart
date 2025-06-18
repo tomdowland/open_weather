@@ -9,7 +9,7 @@ part 'home_page_provider.g.dart';
 abstract class FrontPage with _$FrontPage {
   factory FrontPage({
     @Default(false) bool editing,
-    bool? isBusy,
+    required bool isBusy,
     FullResult? weatherResults,
   }) = _FrontPage;
 }

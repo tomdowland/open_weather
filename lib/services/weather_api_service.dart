@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:open_weather/models/full_result_model.dart';
 import 'package:open_weather/models/weather_model.dart';
 
 class WeatherApiService {
@@ -55,6 +56,37 @@ class WeatherApiService {
           );
         }
         return result;
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<WeatherModel?> getLocalWeather({
+    double? latitude,
+    double? longitude,
+  }) async {
+    try {
+      final response = await _dio.get(
+        '$_url/weather',
+        queryParameters: {
+          'lat': latitude,
+          'lon': longitude,
+          'appid': _apiKey,
+          'units': 'metric', // Or 'imperial'
+        },
+      );
+      if (response.data != null) {
+        final main = response.data['main'];
+        final weather = response.data['weather'][0];
+
+        return WeatherModel(
+          city: response.data['name'],
+          temperature: main['temp'].toDouble(),
+          weather: weather['main'],
+          icon: weather['icon'],
+          dateTime: response.data['dt'] * 1000,
+        );
       }
     } catch (e) {
       rethrow;

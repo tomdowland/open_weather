@@ -41,6 +41,7 @@ class MyApp extends ConsumerWidget {
       theme: lightTheme,
       darkTheme: darkTheme,
       themeMode: settings.darkMode ? ThemeMode.dark : ThemeMode.light,
+      supportedLocales: [Locale('en'), Locale('ja')],
     );
   }
 }

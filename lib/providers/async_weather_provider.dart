@@ -2,6 +2,7 @@ import 'package:open_weather/models/full_result_model.dart';
 import 'package:open_weather/repositories/weather_repository.dart';
 import 'package:open_weather/services/weather_api_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:geolocator/geolocator.dart';
 
 part 'async_weather_provider.g.dart';
 
@@ -21,18 +22,19 @@ class AsyncWeather extends _$AsyncWeather {
   Future<FullResult?> build() async {
     // Attempt to fetch current location weather on startup
     try {
-      // final position = await _determinePosition();
+      final position = await _determinePosition();
       final repository = ref.read(weatherRepositoryProvider);
-      final weather = await ref
-          .read(weatherRepositoryProvider)
-          .getWeather('Otsu');
+      // final weather = await ref
+      //     .read(weatherRepositoryProvider)
+      //     .('Otsu');
+      final weather = await repository.getLocalWeather(
+        latitude: position.latitude,
+        longitude: position.longitude,
+      );
       final forecast = await ref
           .read(weatherRepositoryProvider)
-          .getForecast('Otsu');
-      // final weather = await repository.getWeatherByCoordinates(
-      //   position.latitude,
-      //   position.longitude,
-      // );
+          .getForecast(weather?.city ?? '');
+
       return FullResult(
         city: weather?.city,
         country: weather?.country,
@@ -54,34 +56,40 @@ class AsyncWeather extends _$AsyncWeather {
 
   // Helper method to determine the current position of the device.
   // It handles location service availability and permission requests.
-  // Future<Position> _determinePosition() async {
-  //   bool serviceEnabled;
-  //   LocationPermission permission;
-  //
-  //   // Test if location services are enabled.
-  //   serviceEnabled = await Geolocator.isLocationServiceEnabled();
-  //   if (!serviceEnabled) {
-  //     // Location services are not enabled, don't continue accessing the position.
-  //     return Future.error('Location services are disabled. Please enable them in your device settings.');
-  //   }
-  //
-  //   permission = await Geolocator.checkPermission();
-  //   if (permission == LocationPermission.denied) {
-  //     permission = await Geolocator.requestPermission();
-  //     if (permission == LocationPermission.denied) {
-  //       // Permissions are denied, next time you could try requesting permissions again
-  //       return Future.error('Location permissions are denied. Please grant them to get weather for your current location.');
-  //     }
-  //   }
-  //
-  //   if (permission == LocationPermission.deniedForever) {
-  //     // Permissions are denied forever, handle appropriately.
-  //     return Future.error('Location permissions are permanently denied, we cannot request permissions. Please enable them manually in app settings.');
-  //   }
-  //
-  //   // When we reach here, permissions are granted and we can continue accessing the position of the device.
-  //   return await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-  // }
+  Future<Position> _determinePosition() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    // Test if location services are enabled.
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      // Location services are not enabled, don't continue accessing the position.
+      return Future.error(
+        'Location services are disabled. Please enable them in your device settings.',
+      );
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        // Permissions are denied, next time you could try requesting permissions again
+        return Future.error(
+          'Location permissions are denied. Please grant them to get weather for your current location.',
+        );
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      // Permissions are denied forever, handle appropriately.
+      return Future.error(
+        'Location permissions are permanently denied, we cannot request permissions. Please enable them manually in app settings.',
+      );
+    }
+
+    // When we reach here, permissions are granted and we can continue accessing the position of the device.
+    return await Geolocator.getCurrentPosition();
+  }
 
   // Method to fetch weather by city name (can be triggered by user input)
   Future<FullResult?> fetchWeatherByCity(String city) async {
