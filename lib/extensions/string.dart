@@ -1,6 +1,5 @@
 extension StringExtensions on String {
-  String get toTitleCase => this
-      .split(" ")
-      .map((str) => str[0].toUpperCase() + str.substring(1))
-      .join(" ");
+  String get toTitleCase => split(
+    " ",
+  ).map((str) => str[0].toUpperCase() + str.substring(1)).join(" ");
 }

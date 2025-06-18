@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:open_weather/models/full_result_model.dart';
 import 'package:open_weather/models/weather_model.dart';
 
 class WeatherApiService {
