@@ -1,16 +1,23 @@
-# open_weather
+# Open Weather
 
-A new Flutter project.
+Flutter test project for Baleen Studio
 
-## Getting Started
+## Features
 
-This project is a starting point for a Flutter application.
+- City search
+- Dark mode
+- Geolocation
 
-A few resources to get you started if this is your first Flutter project:
+## Architecture
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+- State management: Riverpod
+- Network: Dio
+- Modelling: Freezed
+- Location: Geolocator
+- Navigation: GoRouter
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Reasoning
+I chose riverpod for state management in this case in part due to familiarity, but also ease of use. Using Riverpod in combination with freezed for model generation, it is possible to have  a variey
+ty of variables available for use in many classes and views without the need for passing variables back and forth through navigation. Riverpod offers a very smooth asynchronous experience that allows for an extra level of abstraction between the view provider layer and the service.
+
+Thinking about how the app should behave on startup, rather than have the user input a city name into the search field, I used geolocator to give find the user's location and give teh local weather data based on this
