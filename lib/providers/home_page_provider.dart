@@ -20,22 +20,33 @@ class HomePageNotifier extends _$HomePageNotifier {
   @override
   FrontPage build() {
     final weather = ref.watch(asyncWeatherProvider);
-    return FrontPage(
-      weatherResults: weather.value,
-      isBusy: weather.isLoading,
-      networkError: weather.hasError,
-    );
+    try {
+      return FrontPage(
+        weatherResults: weather.value,
+        isBusy: weather.isLoading,
+        networkError: weather.hasError,
+      );
+    } catch (e) {
+      return FrontPage(isBusy: false, networkError: weather.hasError);
+    }
   }
 
   Future<void> searchCity(String city) async {
-    final result = await ref
-        .read(asyncWeatherProvider.notifier)
-        .fetchWeatherByCity(city);
-    state = state.copyWith(
-      editing: false,
-      weatherResults: result,
-      isBusy: false,
-    );
+    try {
+      state = state.copyWith(isBusy: true);
+      final result = await ref
+          .read(asyncWeatherProvider.notifier)
+          .fetchWeatherByCity(city);
+      state = state.copyWith(
+        editing: false,
+        weatherResults: result,
+        isBusy: false,
+        networkError: ref.watch(asyncWeatherProvider).hasError,
+      );
+    } catch (e) {
+      state = state.copyWith(editing: false, networkError: true, isBusy: false);
+      rethrow;
+    }
   }
 
   void editCity() {

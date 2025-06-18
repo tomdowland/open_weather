@@ -24,9 +24,6 @@ class AsyncWeather extends _$AsyncWeather {
     try {
       final position = await _determinePosition();
       final repository = ref.read(weatherRepositoryProvider);
-      // final weather = await ref
-      //     .read(weatherRepositoryProvider)
-      //     .('Otsu');
       final weather = await repository.getLocalWeather(
         latitude: position.latitude,
         longitude: position.longitude,
@@ -50,7 +47,8 @@ class AsyncWeather extends _$AsyncWeather {
       // 1. Return null and show a message to the user to enter a city.
       // 2. Re-throw the error to set the provider's state to AsyncError.
       // For now, we'll re-throw to clearly indicate an issue.
-      throw e;
+      AsyncValue.error(e, st);
+      rethrow;
     }
   }
 
@@ -93,7 +91,7 @@ class AsyncWeather extends _$AsyncWeather {
 
   // Method to fetch weather by city name (can be triggered by user input)
   Future<FullResult?> fetchWeatherByCity(String city) async {
-    state = const AsyncValue.loading();
+    // state = const AsyncValue.loading();
     try {
       final repository = ref.read(weatherRepositoryProvider);
       final weather = await repository.getWeather(city);
@@ -107,8 +105,8 @@ class AsyncWeather extends _$AsyncWeather {
         icon: weather?.icon,
         forecast: forecast,
       );
-    } catch (e, st) {
-      state = AsyncValue.error(e, st);
+    } catch (e) {
+      rethrow;
     }
   }
 

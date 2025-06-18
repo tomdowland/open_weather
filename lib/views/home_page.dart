@@ -51,142 +51,166 @@ class HomePage extends HookConsumerWidget {
         child: Stack(
           children: [
             AnimatedOpacity(
-              opacity: weather.isBusy ? 1 : 0,
+              opacity: weather.networkError ? 1 : 0,
+              duration: Duration(milliseconds: 300),
+            ),
+            AnimatedOpacity(
+              opacity: weather.isBusy && !weather.networkError ? 1 : 0,
               duration: Duration(milliseconds: 100),
               child: Center(child: CircularProgressIndicator()),
             ),
             AnimatedOpacity(
-              opacity: weather.isBusy ? 0 : 1,
+              opacity: weather.isBusy && !weather.networkError ? 0 : 1,
               duration: Duration(milliseconds: 300),
-              child:
-                  // weather.networkError
-                  //     ? Center(
-                  //         child: Text(
-                  //           'A network error has occurred, please try again later.',
-                  //           style: TextStyle(fontSize: 36),
-                  //         ),
-                  //       )
-                  //     :
-                  CustomScrollView(
-                    slivers: [
-                      SliverFillRemaining(
-                        child: weather.weatherResults == null
-                            ? Center(
-                                child: Text(
-                                  'Sorry, no results found',
-                                  style: TextStyle(fontSize: 36),
-                                ),
-                              )
-                            : Column(
-                                children: [
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      color: Theme.of(context).cardColor,
-                                      borderRadius: BorderRadius.all(
-                                        Radius.circular(20),
+              child: weather.networkError
+                  ? Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'A network error has occurred, please check your connection and try again later.',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(fontSize: 24),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  : CustomScrollView(
+                      slivers: [
+                        SliverFillRemaining(
+                          child: weather.weatherResults == null
+                              ? Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(16.0),
+                                    child: Text(
+                                      'Sorry, no results found for your search term.',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(fontSize: 24),
+                                    ),
+                                  ),
+                                )
+                              : Column(
+                                  children: [
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        color: Theme.of(context).cardColor,
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(20),
+                                        ),
+                                      ),
+                                      child: SizedBox(
+                                        height: 150,
+                                        width: 150,
+                                        child: Image.network(
+                                          'https://openweathermap.org/img/wn/${weather.weatherResults?.icon}@2x.png',
+                                        ),
                                       ),
                                     ),
-                                    child: SizedBox(
+                                    Text(
+                                      date.format(
+                                        DateTime.fromMillisecondsSinceEpoch(
+                                          weather.weatherResults?.dateTime ?? 0,
+                                        ),
+                                      ),
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    Text(
+                                      weather
+                                              .weatherResults
+                                              ?.weather
+                                              ?.toTitleCase ??
+                                          '',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    Text(
+                                      '${weather.weatherResults?.temperature?.toStringAsFixed(0)}°C',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+
+                                    SizedBox(height: 50),
+
+                                    SizedBox(
                                       height: 150,
-                                      width: 150,
-                                      child: Image.network(
-                                        'https://openweathermap.org/img/wn/${weather.weatherResults?.icon}@2x.png',
-                                      ),
-                                    ),
-                                  ),
-                                  Text(
-                                    date.format(
-                                      DateTime.fromMillisecondsSinceEpoch(
-                                        weather.weatherResults?.dateTime ?? 0,
-                                      ),
-                                    ),
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                  Text(
-                                    weather
+                                      child: ListView.builder(
+                                        scrollDirection: Axis.horizontal,
+                                        itemCount: weather
                                             .weatherResults
-                                            ?.weather
-                                            ?.toTitleCase ??
-                                        '',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                  Text(
-                                    '${weather.weatherResults?.temperature?.toStringAsFixed(0)}°C',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-
-                                  SizedBox(height: 50),
-
-                                  SizedBox(
-                                    height: 150,
-                                    child: ListView.builder(
-                                      scrollDirection: Axis.horizontal,
-                                      itemCount: weather
-                                          .weatherResults
-                                          ?.forecast
-                                          ?.length,
-                                      itemBuilder: (_, __) {
-                                        final item = weather
-                                            .weatherResults
-                                            ?.forecast?[__];
-                                        return Container(
-                                          decoration: BoxDecoration(
-                                            color: Theme.of(context).cardColor,
-                                            borderRadius: BorderRadius.all(
-                                              Radius.circular(20),
-                                            ),
-                                          ),
-                                          margin: EdgeInsets.all(8),
-                                          height: 160,
-                                          width: 120,
-                                          child: Column(
-                                            children: [
-                                              SizedBox(
-                                                height: 40,
-                                                width: 40,
-                                                child: Image.network(
-                                                  'https://openweathermap.org/img/wn/${item?.icon}@2x.png',
-                                                ),
+                                            ?.forecast
+                                            ?.length,
+                                        itemBuilder: (_, __) {
+                                          final item = weather
+                                              .weatherResults
+                                              ?.forecast?[__];
+                                          return Container(
+                                            decoration: BoxDecoration(
+                                              color: Theme.of(
+                                                context,
+                                              ).cardColor,
+                                              borderRadius: BorderRadius.all(
+                                                Radius.circular(20),
                                               ),
-                                              Text(
-                                                date.format(
-                                                  DateTime.fromMillisecondsSinceEpoch(
-                                                    item!.dateTime,
+                                            ),
+                                            margin: EdgeInsets.all(8),
+                                            height: 160,
+                                            width: 120,
+                                            child: Column(
+                                              children: [
+                                                SizedBox(
+                                                  height: 40,
+                                                  width: 40,
+                                                  child: Image.network(
+                                                    'https://openweathermap.org/img/wn/${item?.icon}@2x.png',
                                                   ),
                                                 ),
-                                                style: TextStyle(fontSize: 16),
-                                                textAlign: TextAlign.center,
-                                              ),
-                                              Text(
-                                                item?.weather.toTitleCase ?? '',
-                                                style: TextStyle(fontSize: 16),
-                                                textAlign: TextAlign.center,
-                                              ),
-                                              Text(
-                                                '${item?.temperature.toStringAsFixed(0)}°C',
-                                                style: TextStyle(fontSize: 16),
-                                                textAlign: TextAlign.center,
-                                              ),
-                                            ],
-                                          ),
-                                        );
-                                      },
+                                                Text(
+                                                  date.format(
+                                                    DateTime.fromMillisecondsSinceEpoch(
+                                                      item?.dateTime ?? 0,
+                                                    ),
+                                                  ),
+                                                  style: TextStyle(
+                                                    fontSize: 16,
+                                                  ),
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                                Text(
+                                                  item?.weather.toTitleCase ??
+                                                      '',
+                                                  style: TextStyle(
+                                                    fontSize: 16,
+                                                  ),
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                                Text(
+                                                  '${item?.temperature.toStringAsFixed(0)}°C',
+                                                  style: TextStyle(
+                                                    fontSize: 16,
+                                                  ),
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        },
+                                      ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                      ),
-                    ],
-                  ),
+                                  ],
+                                ),
+                        ),
+                      ],
+                    ),
             ),
           ],
         ),
