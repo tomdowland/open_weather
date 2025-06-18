@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:open_weather/extensions/string.dart';
 import 'package:open_weather/providers/home_page_provider.dart';
 
 class HomePage extends HookConsumerWidget {
@@ -17,6 +18,7 @@ class HomePage extends HookConsumerWidget {
         title: weather.editing
             ? TextField(
                 autofocus: true,
+                decoration: InputDecoration(hintText: 'Enter a city name'),
                 onSubmitted: ref
                     .read(homePageNotifierProvider.notifier)
                     .searchCity,
@@ -56,92 +58,135 @@ class HomePage extends HookConsumerWidget {
             AnimatedOpacity(
               opacity: weather.isBusy ? 0 : 1,
               duration: Duration(milliseconds: 300),
-              child: CustomScrollView(
-                slivers: [
-                  SliverFillRemaining(
-                    child: weather.weatherResults == null
-                        ? Center(child: Text('Sorry, no results found'))
-                        : Column(
-                            children: [
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: Theme.of(context).cardColor,
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(20),
-                                  ),
+              child:
+                  // weather.networkError
+                  //     ? Center(
+                  //         child: Text(
+                  //           'A network error has occurred, please try again later.',
+                  //           style: TextStyle(fontSize: 36),
+                  //         ),
+                  //       )
+                  //     :
+                  CustomScrollView(
+                    slivers: [
+                      SliverFillRemaining(
+                        child: weather.weatherResults == null
+                            ? Center(
+                                child: Text(
+                                  'Sorry, no results found',
+                                  style: TextStyle(fontSize: 36),
                                 ),
-                                child: SizedBox(
-                                  height: 150,
-                                  width: 150,
-                                  child: Image.network(
-                                    'https://openweathermap.org/img/wn/${weather.weatherResults?.icon}@2x.png',
-                                  ),
-                                ),
-                              ),
-                              Text(
-                                date.format(
-                                  DateTime.fromMillisecondsSinceEpoch(
-                                    weather.weatherResults?.dateTime ?? 0,
-                                  ),
-                                ),
-                              ),
-                              Text(weather.weatherResults?.weather ?? ''),
-                              Text(
-                                '${weather.weatherResults?.temperature?.toStringAsFixed(0)}°C',
-                              ),
-
-                              SizedBox(height: 50),
-
-                              SizedBox(
-                                height: 150,
-                                child: ListView.builder(
-                                  scrollDirection: Axis.horizontal,
-                                  itemCount:
-                                      weather.weatherResults?.forecast?.length,
-                                  itemBuilder: (_, __) {
-                                    final item =
-                                        weather.weatherResults?.forecast?[__];
-                                    return Container(
-                                      decoration: BoxDecoration(
-                                        color: Theme.of(context).cardColor,
-                                        borderRadius: BorderRadius.all(
-                                          Radius.circular(20),
-                                        ),
+                              )
+                            : Column(
+                                children: [
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(context).cardColor,
+                                      borderRadius: BorderRadius.all(
+                                        Radius.circular(20),
                                       ),
-                                      margin: EdgeInsets.all(8),
+                                    ),
+                                    child: SizedBox(
                                       height: 150,
-                                      width: 100,
-                                      child: Column(
-                                        children: [
-                                          SizedBox(
-                                            height: 40,
-                                            width: 40,
-                                            child: Image.network(
-                                              'https://openweathermap.org/img/wn/${item?.icon}@2x.png',
-                                            ),
-                                          ),
-                                          Text(item?.weather ?? ''),
-                                          Text(
-                                            '${item?.temperature.toStringAsFixed(0)}°C',
-                                          ),
-                                          Text(
-                                            date.format(
-                                              DateTime.fromMillisecondsSinceEpoch(
-                                                item!.dateTime,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
+                                      width: 150,
+                                      child: Image.network(
+                                        'https://openweathermap.org/img/wn/${weather.weatherResults?.icon}@2x.png',
                                       ),
-                                    );
-                                  },
-                                ),
+                                    ),
+                                  ),
+                                  Text(
+                                    date.format(
+                                      DateTime.fromMillisecondsSinceEpoch(
+                                        weather.weatherResults?.dateTime ?? 0,
+                                      ),
+                                    ),
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  Text(
+                                    weather
+                                            .weatherResults
+                                            ?.weather
+                                            ?.toTitleCase ??
+                                        '',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  Text(
+                                    '${weather.weatherResults?.temperature?.toStringAsFixed(0)}°C',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+
+                                  SizedBox(height: 50),
+
+                                  SizedBox(
+                                    height: 150,
+                                    child: ListView.builder(
+                                      scrollDirection: Axis.horizontal,
+                                      itemCount: weather
+                                          .weatherResults
+                                          ?.forecast
+                                          ?.length,
+                                      itemBuilder: (_, __) {
+                                        final item = weather
+                                            .weatherResults
+                                            ?.forecast?[__];
+                                        return Container(
+                                          decoration: BoxDecoration(
+                                            color: Theme.of(context).cardColor,
+                                            borderRadius: BorderRadius.all(
+                                              Radius.circular(20),
+                                            ),
+                                          ),
+                                          margin: EdgeInsets.all(8),
+                                          height: 160,
+                                          width: 120,
+                                          child: Column(
+                                            children: [
+                                              SizedBox(
+                                                height: 40,
+                                                width: 40,
+                                                child: Image.network(
+                                                  'https://openweathermap.org/img/wn/${item?.icon}@2x.png',
+                                                ),
+                                              ),
+                                              Text(
+                                                date.format(
+                                                  DateTime.fromMillisecondsSinceEpoch(
+                                                    item!.dateTime,
+                                                  ),
+                                                ),
+                                                style: TextStyle(fontSize: 16),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                              Text(
+                                                item?.weather.toTitleCase ?? '',
+                                                style: TextStyle(fontSize: 16),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                              Text(
+                                                '${item?.temperature.toStringAsFixed(0)}°C',
+                                                style: TextStyle(fontSize: 16),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
             ),
           ],
         ),

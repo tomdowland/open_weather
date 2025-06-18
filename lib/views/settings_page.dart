@@ -23,7 +23,7 @@ class SettingsPage extends ConsumerWidget {
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Text('Dark mode'),
+                      Text('Dark mode', style: TextStyle(fontSize: 24)),
                       Spacer(),
                       Switch(
                         value: settings.darkMode,

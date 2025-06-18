@@ -10,6 +10,7 @@ abstract class FrontPage with _$FrontPage {
   factory FrontPage({
     @Default(false) bool editing,
     required bool isBusy,
+    required bool networkError,
     FullResult? weatherResults,
   }) = _FrontPage;
 }
@@ -19,7 +20,11 @@ class HomePageNotifier extends _$HomePageNotifier {
   @override
   FrontPage build() {
     final weather = ref.watch(asyncWeatherProvider);
-    return FrontPage(weatherResults: weather.value, isBusy: weather.isLoading);
+    return FrontPage(
+      weatherResults: weather.value,
+      isBusy: weather.isLoading,
+      networkError: weather.hasError,
+    );
   }
 
   Future<void> searchCity(String city) async {

@@ -21,7 +21,7 @@ class WeatherApiService {
         return WeatherModel(
           city: response.data['name'],
           temperature: main['temp'].toDouble(),
-          weather: weather['main'],
+          weather: weather['description'],
           icon: weather['icon'],
           dateTime: response.data['dt'] * 1000,
         );
@@ -49,7 +49,7 @@ class WeatherApiService {
             WeatherModel(
               // city: response.data['name'],
               temperature: main['temp'].toDouble(),
-              weather: weather['main'],
+              weather: weather['description'],
               icon: weather['icon'],
               dateTime: dateTime,
             ),
@@ -83,7 +83,7 @@ class WeatherApiService {
         return WeatherModel(
           city: response.data['name'],
           temperature: main['temp'].toDouble(),
-          weather: weather['main'],
+          weather: weather['description'],
           icon: weather['icon'],
           dateTime: response.data['dt'] * 1000,
         );
