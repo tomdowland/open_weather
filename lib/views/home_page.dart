@@ -79,6 +79,7 @@ class HomePage extends HookConsumerWidget {
                   : CustomScrollView(
                       slivers: [
                         SliverFillRemaining(
+                          hasScrollBody: false,
                           child: weather.weatherResults == null
                               ? Center(
                                   child: Padding(
