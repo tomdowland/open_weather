@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:dio/dio.dart';
 import 'package:open_weather/models/weather_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class WeatherApiService {
   final Dio _dio = Dio();
@@ -9,11 +10,10 @@ class WeatherApiService {
   static const String _url = 'https://api.openweathermap.org/data/2.5';
   static const String _apiKey = 'e5d3ccda6cdaa06e3c5c154dc9fc6c94';
 
-  Future<WeatherModel?> fetchTodayWeather(
-    String city, {
-    String? language,
-  }) async {
+  Future<WeatherModel?> fetchTodayWeather(String city) async {
     try {
+      final prefs = await SharedPreferences.getInstance();
+      final language = prefs.getString('locale');
       final response = await _dio.get(
         '$_url/weather',
         queryParameters: {
@@ -43,11 +43,10 @@ class WeatherApiService {
     }
   }
 
-  Future<List<WeatherModel>?> fetchForecast(
-    String cityName, {
-    String? language,
-  }) async {
+  Future<List<WeatherModel>?> fetchForecast(String cityName) async {
     try {
+      final prefs = await SharedPreferences.getInstance();
+      final language = prefs.getString('locale');
       final response = await _dio.get(
         '$_url/forecast',
         queryParameters: {
@@ -88,9 +87,10 @@ class WeatherApiService {
   Future<WeatherModel?> getLocalWeather({
     double? latitude,
     double? longitude,
-    String? language,
   }) async {
     try {
+      final prefs = await SharedPreferences.getInstance();
+      final language = prefs.getString('locale');
       final response = await _dio.get(
         '$_url/weather',
         queryParameters: {

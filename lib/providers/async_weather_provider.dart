@@ -16,7 +16,6 @@ final weatherRepositoryProvider = Provider((ref) {
   return WeatherRepository(apiService);
 });
 
-// AsyncNotifier for managing the weather state using Riverpod code generation
 @riverpod
 class AsyncWeather extends _$AsyncWeather {
   @override
@@ -25,18 +24,13 @@ class AsyncWeather extends _$AsyncWeather {
     try {
       final position = await _determinePosition();
       final repository = ref.read(weatherRepositoryProvider);
-      final settings = ref.watch(settingsNotifierProvider);
       final weather = await repository.getLocalWeather(
         latitude: position.latitude,
         longitude: position.longitude,
-        language: settings.locale?.languageCode ?? 'en',
       );
       final forecast = await ref
           .read(weatherRepositoryProvider)
-          .getForecast(
-            weather?.city ?? '',
-            language: settings.locale?.languageCode ?? 'en',
-          );
+          .getForecast(weather?.city ?? '');
 
       return FullResult(
         city: weather?.city,
@@ -97,18 +91,10 @@ class AsyncWeather extends _$AsyncWeather {
 
   // Method to fetch weather by city name (can be triggered by user input)
   Future<FullResult?> fetchWeatherByCity(String city) async {
-    // state = const AsyncValue.loading();
     try {
       final repository = ref.read(weatherRepositoryProvider);
-      final settings = ref.watch(settingsNotifierProvider);
-      final weather = await repository.getWeather(
-        city,
-        language: settings.locale?.languageCode ?? 'en',
-      );
-      final forecast = await repository.getForecast(
-        city,
-        language: settings.locale?.languageCode ?? 'en',
-      );
+      final weather = await repository.getWeather(city);
+      final forecast = await repository.getForecast(city);
       return FullResult(
         city: weather?.city,
         country: weather?.country,
@@ -122,84 +108,4 @@ class AsyncWeather extends _$AsyncWeather {
       rethrow;
     }
   }
-
-  // Method to re-fetch weather for current location (e.g., refresh button)
-  // Future<void> refreshCurrentLocationWeather() async {
-  //   state = const AsyncValue.loading();
-  //   try {
-  //     final position = await _determinePosition();
-  //     final repository = ref.read(weatherRepositoryProvider);
-  //     final weather = await repository.getWeatherByCoordinates(position.latitude, position.longitude);
-  //     state = AsyncValue.data(weather);
-  //   } catch (e, st) {
-  //     state = AsyncValue.error(e, st);
-  //   }
-  // }
 }
-
-// import 'package:flutter_riverpod/flutter_riverpod.dart';
-// import 'package:riverpod_annotation/riverpod_annotation.dart';
-// import 'package:open_weather/models/full_result_model.dart';
-// import 'package:open_weather/models/weather_model.dart';
-// import 'package:open_weather/repositories/weather_repository.dart';
-// import 'package:open_weather/services/weather_api_service.dart';
-//
-// final weatherApiService = Provider((ref) => WeatherApiService());
-//
-// // Provider for the Repository
-// final weatherRepositoryProvider = Provider((ref) {
-//   final apiService = ref.watch(weatherApiService);
-//   return WeatherRepository(apiService);
-// });
-//
-// // StateNotifierProvider for managing the weather state
-// // This provider will hold the current weather data, loading, and error states.
-// final weatherProvider =
-//     StateNotifierProvider.autoDispose<WeatherNotifier, AsyncValue<FullResult?>>(
-//       (ref) {
-//         final repository = ref.watch(weatherRepositoryProvider);
-//         return WeatherNotifier(repository);
-//       },
-//     );
-//
-// class WeatherNotifier extends StateNotifier<AsyncValue<FullResult?>> {
-//   final WeatherRepository _repository;
-//
-//   WeatherNotifier(this._repository)
-//     : super(const AsyncValue.data(null)); // Initial state is null data
-//
-//   Future<void> fetchWeather(String? city) async {
-//     state = const AsyncValue.loading(); // Set state to loading
-//     try {
-//       final weather = await _repository.getWeather(city ?? 'London,uk');
-//       final forecast = await _repository.getForecast(city ?? 'London,uk');
-//       final result = FullResult(
-//         city: weather?.city,
-//         country: weather?.country,
-//         weather: weather?.weather,
-//         temperature: weather?.temperature,
-//         dateTime: weather?.dateTime,
-//         icon: weather?.icon,
-//         forecast: forecast,
-//       );
-//       state = AsyncValue.data(result); // Set state to data on success
-//     } catch (e, st) {
-//       state = AsyncValue.error(e, st); // Set state to error on failure
-//     }
-//   }
-// }
-//
-// final forecastProvider =
-//     StateNotifierProvider.autoDispose<
-//       ForecastNotifier,
-//       AsyncValue<List<WeatherModel>?>
-//     >((ref) {
-//       final repository = ref.watch(weatherRepositoryProvider);
-//       return ForecastNotifier(repository);
-//     });
-//
-// class ForecastNotifier extends StateNotifier<AsyncValue<List<WeatherModel>?>> {
-//   final WeatherRepository _repository;
-//
-//   ForecastNotifier(this._repository) : super(const AsyncValue.data(null));
-// }

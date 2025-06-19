@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:open_weather/extensions/string.dart';
+import 'package:open_weather/l10n/app_localizations.dart';
 import 'package:open_weather/providers/home_page_provider.dart';
 
 class HomePage extends HookConsumerWidget {
@@ -11,6 +12,7 @@ class HomePage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final weather = ref.watch(homePageNotifierProvider);
+    final l10n = AppLocalizations.of(context);
     DateFormat date = DateFormat('MM/dd HH:mm');
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColor,
@@ -18,7 +20,7 @@ class HomePage extends HookConsumerWidget {
         title: weather.editing
             ? TextField(
                 autofocus: true,
-                decoration: InputDecoration(hintText: 'Enter a city'),
+                decoration: InputDecoration(hintText: l10n!.enterCityHint),
                 onSubmitted: ref
                     .read(homePageNotifierProvider.notifier)
                     .searchCity,
@@ -66,7 +68,7 @@ class HomePage extends HookConsumerWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              'A network error has occurred, please check your connection and try again later.',
+                              l10n!.networkError,
                               textAlign: TextAlign.center,
                               style: TextStyle(fontSize: 24),
                             ),
@@ -82,7 +84,7 @@ class HomePage extends HookConsumerWidget {
                                   child: Padding(
                                     padding: const EdgeInsets.all(16.0),
                                     child: Text(
-                                      'Sorry, no results found for your search term.',
+                                      l10n!.noResults,
                                       textAlign: TextAlign.center,
                                       style: TextStyle(fontSize: 24),
                                     ),
@@ -91,7 +93,7 @@ class HomePage extends HookConsumerWidget {
                               : Column(
                                   children: [
                                     Text(
-                                      'Current Weather',
+                                      l10n!.currentWeather,
                                       style: TextStyle(
                                         fontSize: 24,
                                         fontWeight: FontWeight.w500,
@@ -144,7 +146,7 @@ class HomePage extends HookConsumerWidget {
 
                                     SizedBox(height: 50),
                                     Text(
-                                      'Weather Forecast',
+                                      l10n.weatherForecast,
                                       style: TextStyle(
                                         fontSize: 24,
                                         fontWeight: FontWeight.w500,

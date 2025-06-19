@@ -6,26 +6,21 @@ class WeatherRepository {
 
   WeatherRepository(this._apiService);
 
-  Future<WeatherModel?> getWeather(String city, {String language = 'en'}) {
-    return _apiService.fetchTodayWeather(city, language: language);
+  Future<WeatherModel?> getWeather(String city) {
+    return _apiService.fetchTodayWeather(city);
   }
 
-  Future<List<WeatherModel>?> getForecast(
-    String city, {
-    String language = 'en',
-  }) {
-    return _apiService.fetchForecast(city, language: language);
+  Future<List<WeatherModel>?> getForecast(String city) {
+    return _apiService.fetchForecast(city);
   }
 
   Future<WeatherModel?> getLocalWeather({
     required double latitude,
     required double longitude,
-    String language = 'en',
   }) {
     return _apiService.getLocalWeather(
       latitude: latitude,
       longitude: longitude,
-      language: language,
     );
   }
 }
