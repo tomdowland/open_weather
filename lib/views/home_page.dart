@@ -18,7 +18,7 @@ class HomePage extends HookConsumerWidget {
         title: weather.editing
             ? TextField(
                 autofocus: true,
-                decoration: InputDecoration(hintText: 'Enter a city name'),
+                decoration: InputDecoration(hintText: 'Enter a city'),
                 onSubmitted: ref
                     .read(homePageNotifierProvider.notifier)
                     .searchCity,
@@ -50,10 +50,6 @@ class HomePage extends HookConsumerWidget {
         padding: EdgeInsets.only(top: 56),
         child: Stack(
           children: [
-            AnimatedOpacity(
-              opacity: weather.networkError ? 1 : 0,
-              duration: Duration(milliseconds: 300),
-            ),
             AnimatedOpacity(
               opacity: weather.isBusy && !weather.networkError ? 1 : 0,
               duration: Duration(milliseconds: 100),
@@ -94,6 +90,13 @@ class HomePage extends HookConsumerWidget {
                                 )
                               : Column(
                                   children: [
+                                    Text(
+                                      'Current Weather',
+                                      style: TextStyle(
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
                                     Container(
                                       decoration: BoxDecoration(
                                         color: Theme.of(context).cardColor,
@@ -140,6 +143,13 @@ class HomePage extends HookConsumerWidget {
                                     ),
 
                                     SizedBox(height: 50),
+                                    Text(
+                                      'Weather Forecast',
+                                      style: TextStyle(
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
 
                                     SizedBox(
                                       height: 150,

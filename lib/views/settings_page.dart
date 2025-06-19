@@ -35,6 +35,26 @@ class SettingsPage extends ConsumerWidget {
                       ),
                     ],
                   ),
+                  DropdownButton<Locale>(
+                    value: settings.locale,
+                    icon: const Icon(Icons.language, color: Colors.white),
+                    dropdownColor: Colors.blueGrey[700],
+                    underline: const SizedBox(),
+                    onChanged: (Locale? newLocale) {
+                      if (newLocale != null) {
+                        ref
+                            .read(settingsNotifierProvider.notifier)
+                            .setLocale(newLocale);
+                      }
+                    },
+                    items: const <DropdownMenuItem<Locale>>[
+                      DropdownMenuItem(
+                        value: Locale('en'),
+                        child: Text('English'),
+                      ),
+                      DropdownMenuItem(value: Locale('ja'), child: Text('日本語')),
+                    ],
+                  ),
                 ],
               ),
             ),

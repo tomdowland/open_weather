@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:open_weather/generated/l10n.dart';
+import 'package:open_weather/l10n/app_localizations.dart';
 import 'package:open_weather/meta/theme.dart';
 import 'package:open_weather/providers/settings_provider.dart';
 import 'package:open_weather/views/home_page.dart';
@@ -40,8 +43,15 @@ class MyApp extends ConsumerWidget {
       routerConfig: _router,
       theme: lightTheme,
       darkTheme: darkTheme,
+      locale: settings.locale,
       themeMode: settings.darkMode ? ThemeMode.dark : ThemeMode.light,
       supportedLocales: [Locale('en'), Locale('ja')],
+      localizationsDelegates: [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
     );
   }
 }

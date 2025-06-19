@@ -1,4 +1,5 @@
 import 'package:open_weather/models/full_result_model.dart';
+import 'package:open_weather/providers/settings_provider.dart';
 import 'package:open_weather/repositories/weather_repository.dart';
 import 'package:open_weather/services/weather_api_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -24,13 +25,18 @@ class AsyncWeather extends _$AsyncWeather {
     try {
       final position = await _determinePosition();
       final repository = ref.read(weatherRepositoryProvider);
+      final settings = ref.watch(settingsNotifierProvider);
       final weather = await repository.getLocalWeather(
         latitude: position.latitude,
         longitude: position.longitude,
+        language: settings.locale?.languageCode ?? 'en',
       );
       final forecast = await ref
           .read(weatherRepositoryProvider)
-          .getForecast(weather?.city ?? '');
+          .getForecast(
+            weather?.city ?? '',
+            language: settings.locale?.languageCode ?? 'en',
+          );
 
       return FullResult(
         city: weather?.city,
@@ -94,8 +100,15 @@ class AsyncWeather extends _$AsyncWeather {
     // state = const AsyncValue.loading();
     try {
       final repository = ref.read(weatherRepositoryProvider);
-      final weather = await repository.getWeather(city);
-      final forecast = await repository.getForecast(city);
+      final settings = ref.watch(settingsNotifierProvider);
+      final weather = await repository.getWeather(
+        city,
+        language: settings.locale?.languageCode ?? 'en',
+      );
+      final forecast = await repository.getForecast(
+        city,
+        language: settings.locale?.languageCode ?? 'en',
+      );
       return FullResult(
         city: weather?.city,
         country: weather?.country,

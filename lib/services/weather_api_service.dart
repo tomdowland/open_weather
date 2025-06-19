@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:dio/dio.dart';
 import 'package:open_weather/models/weather_model.dart';
 
@@ -7,13 +9,21 @@ class WeatherApiService {
   static const String _url = 'https://api.openweathermap.org/data/2.5';
   static const String _apiKey = 'e5d3ccda6cdaa06e3c5c154dc9fc6c94';
 
-  Future<WeatherModel?> fetchTodayWeather(String city) async {
+  Future<WeatherModel?> fetchTodayWeather(
+    String city, {
+    String? language,
+  }) async {
     try {
       final response = await _dio.get(
         '$_url/weather',
-        queryParameters: {'q': city, 'appid': _apiKey, 'units': 'metric'},
+        queryParameters: {
+          'q': city,
+          'appid': _apiKey,
+          'units': 'metric',
+          'lang': language,
+        },
       );
-      if (response.data != null) {
+      if (response.statusCode == 200) {
         final main = response.data['main'];
         final weather = response.data['weather'][0];
 
@@ -25,18 +35,29 @@ class WeatherApiService {
           dateTime: response.data['dt'] * 1000,
         );
       }
+      if (response.statusCode == 404) {
+        return null;
+      }
     } catch (e) {
       rethrow;
     }
   }
 
-  Future<List<WeatherModel>?> fetchForecast(String cityName) async {
+  Future<List<WeatherModel>?> fetchForecast(
+    String cityName, {
+    String? language,
+  }) async {
     try {
       final response = await _dio.get(
         '$_url/forecast',
-        queryParameters: {'q': cityName, 'appid': _apiKey, 'units': 'metric'},
+        queryParameters: {
+          'q': cityName,
+          'appid': _apiKey,
+          'units': 'metric',
+          'lang': language,
+        },
       );
-      if (response.data != null) {
+      if (response.statusCode == 200) {
         final list = response.data['list'];
         final result = <WeatherModel>[];
         for (var i = 0; i < list.length - 1; i++) {
@@ -56,6 +77,9 @@ class WeatherApiService {
         }
         return result;
       }
+      if (response.statusCode == 404) {
+        return null;
+      }
     } catch (e) {
       rethrow;
     }
@@ -64,6 +88,7 @@ class WeatherApiService {
   Future<WeatherModel?> getLocalWeather({
     double? latitude,
     double? longitude,
+    String? language,
   }) async {
     try {
       final response = await _dio.get(
@@ -72,10 +97,11 @@ class WeatherApiService {
           'lat': latitude,
           'lon': longitude,
           'appid': _apiKey,
-          'units': 'metric', // Or 'imperial'
+          'units': 'metric',
+          'lang': language,
         },
       );
-      if (response.data != null) {
+      if (response.statusCode == 200) {
         final main = response.data['main'];
         final weather = response.data['weather'][0];
 
@@ -86,6 +112,9 @@ class WeatherApiService {
           icon: weather['icon'],
           dateTime: response.data['dt'] * 1000,
         );
+      }
+      if (response.statusCode == 404) {
+        return null;
       }
     } catch (e) {
       rethrow;
