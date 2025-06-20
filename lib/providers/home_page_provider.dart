@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:open_weather/models/full_result_model.dart';
 import 'package:open_weather/providers/async_weather_provider.dart';
@@ -26,8 +27,12 @@ class HomePageNotifier extends _$HomePageNotifier {
         isBusy: weather.isLoading,
         networkError: weather.hasError,
       );
-    } catch (e) {
-      return FrontPage(isBusy: false, networkError: weather.hasError);
+    } on DioException catch (e) {
+      if (e.response == null) {
+        return FrontPage(isBusy: false, networkError: weather.hasError);
+      } else {
+        return FrontPage(isBusy: false, networkError: false);
+      }
     }
   }
 
@@ -43,9 +48,14 @@ class HomePageNotifier extends _$HomePageNotifier {
         isBusy: false,
         networkError: ref.watch(asyncWeatherProvider).hasError,
       );
-    } catch (e) {
-      state = state.copyWith(editing: false, networkError: true, isBusy: false);
-      rethrow;
+    } on DioException catch (e) {
+      if (e.response == null) {
+        state = state.copyWith(
+          editing: false,
+          isBusy: false,
+          networkError: true,
+        );
+      }
     }
   }
 

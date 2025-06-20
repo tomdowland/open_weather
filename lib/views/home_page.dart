@@ -26,7 +26,7 @@ class HomePage extends HookConsumerWidget {
                     .searchCity,
               )
             : Text(
-                weather.weatherResults?.city ?? '',
+                weather.weatherResults?.city ?? l10n!.weatherAppTitle,
                 textAlign: TextAlign.center,
               ),
         centerTitle: true,

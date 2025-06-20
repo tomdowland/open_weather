@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:dio/dio.dart';
 import 'package:open_weather/models/weather_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';

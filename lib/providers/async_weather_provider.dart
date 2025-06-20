@@ -1,5 +1,7 @@
+import 'dart:io';
+
+import 'package:dio/dio.dart';
 import 'package:open_weather/models/full_result_model.dart';
-import 'package:open_weather/providers/settings_provider.dart';
 import 'package:open_weather/repositories/weather_repository.dart';
 import 'package:open_weather/services/weather_api_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -41,14 +43,11 @@ class AsyncWeather extends _$AsyncWeather {
         icon: weather?.icon,
         forecast: forecast,
       );
-    } catch (e, st) {
-      print('Error fetching initial location weather: $e');
-      // If location or initial fetch fails, you might want to:
-      // 1. Return null and show a message to the user to enter a city.
-      // 2. Re-throw the error to set the provider's state to AsyncError.
-      // For now, we'll re-throw to clearly indicate an issue.
-      AsyncValue.error(e, st);
+    } on DioException catch (e) {
+      // if (e.response == null) {
       rethrow;
+      // }
+      ;
     }
   }
 
@@ -86,7 +85,11 @@ class AsyncWeather extends _$AsyncWeather {
     }
 
     // When we reach here, permissions are granted and we can continue accessing the position of the device.
-    return await Geolocator.getCurrentPosition();
+    try {
+      return await Geolocator.getCurrentPosition();
+    } on DioException catch (e) {
+      rethrow;
+    }
   }
 
   // Method to fetch weather by city name (can be triggered by user input)
@@ -104,8 +107,10 @@ class AsyncWeather extends _$AsyncWeather {
         icon: weather?.icon,
         forecast: forecast,
       );
-    } catch (e) {
-      rethrow;
+    } on DioException catch (e) {
+      if (e.response == null) {
+        rethrow;
+      }
     }
   }
 }
