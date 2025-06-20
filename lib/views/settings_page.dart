@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:open_weather/l10n/app_localizations.dart';
-import 'package:open_weather/providers/async_weather_provider.dart';
 import 'package:open_weather/providers/home_page_provider.dart';
 import 'package:open_weather/providers/settings_provider.dart';
 
@@ -60,7 +59,8 @@ class SettingsPage extends ConsumerWidget {
                             color: Colors.white,
                           ),
                           onChanged: (Locale? newLocale) async {
-                            if (newLocale != null) {
+                            if (newLocale != null &&
+                                newLocale != settings.locale) {
                               await ref
                                   .read(settingsNotifierProvider.notifier)
                                   .setLocale(newLocale);

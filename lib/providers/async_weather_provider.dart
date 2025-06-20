@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:dio/dio.dart';
 import 'package:open_weather/models/full_result_model.dart';
 import 'package:open_weather/repositories/weather_repository.dart';
@@ -43,11 +41,8 @@ class AsyncWeather extends _$AsyncWeather {
         icon: weather?.icon,
         forecast: forecast,
       );
-    } on DioException catch (e) {
-      // if (e.response == null) {
+    } on DioException {
       rethrow;
-      // }
-      ;
     }
   }
 
@@ -87,7 +82,7 @@ class AsyncWeather extends _$AsyncWeather {
     // When we reach here, permissions are granted and we can continue accessing the position of the device.
     try {
       return await Geolocator.getCurrentPosition();
-    } on DioException catch (e) {
+    } on DioException {
       rethrow;
     }
   }
@@ -112,5 +107,6 @@ class AsyncWeather extends _$AsyncWeather {
         rethrow;
       }
     }
+    return null;
   }
 }

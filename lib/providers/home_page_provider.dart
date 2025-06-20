@@ -38,7 +38,7 @@ class HomePageNotifier extends _$HomePageNotifier {
 
   Future<void> searchCity(String city) async {
     try {
-      state = state.copyWith(isBusy: true);
+      state = state.copyWith(isBusy: true, networkError: false);
       final result = await ref
           .read(asyncWeatherProvider.notifier)
           .fetchWeatherByCity(city);
@@ -46,7 +46,7 @@ class HomePageNotifier extends _$HomePageNotifier {
         editing: false,
         weatherResults: result,
         isBusy: false,
-        networkError: ref.watch(asyncWeatherProvider).hasError,
+        networkError: false,
       );
     } on DioException catch (e) {
       if (e.response == null) {

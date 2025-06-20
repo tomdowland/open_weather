@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:open_weather/generated/l10n.dart';
 import 'package:open_weather/l10n/app_localizations.dart';
 import 'package:open_weather/meta/theme.dart';
 import 'package:open_weather/providers/settings_provider.dart';

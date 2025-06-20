@@ -35,13 +35,8 @@ class SettingsNotifier extends _$SettingsNotifier {
   }
 
   Future<void> setLocale(Locale newLocale) async {
-    final weather = ref.watch(asyncWeatherProvider);
     state = state.copyWith(locale: newLocale);
     final prefs = await SharedPreferences.getInstance();
     prefs.setString('locale', state.locale?.languageCode ?? '');
-
-    await ref
-        .read(asyncWeatherProvider.notifier)
-        .fetchWeatherByCity(weather.value?.city ?? '');
   }
 }

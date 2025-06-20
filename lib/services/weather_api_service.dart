@@ -39,6 +39,7 @@ class WeatherApiService {
     } catch (e) {
       rethrow;
     }
+    return null;
   }
 
   Future<List<WeatherModel>?> fetchForecast(String cityName) async {
@@ -80,6 +81,7 @@ class WeatherApiService {
     } catch (e) {
       rethrow;
     }
+    return null;
   }
 
   Future<WeatherModel?> getLocalWeather({
@@ -117,5 +119,6 @@ class WeatherApiService {
     } catch (e) {
       rethrow;
     }
+    return null;
   }
 }
