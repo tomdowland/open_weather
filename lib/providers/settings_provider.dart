@@ -2,7 +2,6 @@ import 'dart:ui';
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:open_weather/providers/async_settings.dart';
-import 'package:open_weather/providers/async_weather_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 part 'settings_provider.freezed.dart';
