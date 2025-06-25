@@ -1,0 +1,17 @@
+{
+  "@@locale": "en",
+  "weatherAppTitle": "Open Weather",
+  "enterCityHint": "Enter a city",
+  "settings": "Settings",
+  "darkMode": "Dark Mode",
+  "languageSettings": "Language",
+  "english": "English",
+  "japanese": "日本語",
+  "currentWeather": "Current Weather",
+  "weatherForecast": "Weather Forecast",
+  "locationServicesDisabled": "Location services are disabled. Please enable them in your device settings.",
+  "locationPermissionsDenied": "Location permissions are denied. Please grant them to get weather for your current location.",
+  "locationPermissionsPermanentlyDenied": "Location permissions are permanently denied, we cannot request permissions. Please enable them manually in app settings.",
+  "networkError": "A network error has occurred, please check your connection and try again later.",
+  "noResults": "Sorry, no results found for your search term."
+}
