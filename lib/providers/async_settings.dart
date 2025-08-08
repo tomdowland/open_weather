@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:open_weather/providers/settings_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 part 'async_settings.g.dart';
 
 @riverpod

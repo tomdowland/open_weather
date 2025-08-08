@@ -1,17 +1,20 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:open_weather/models/full_result_model.dart';
 import 'package:open_weather/repositories/weather_repository.dart';
 import 'package:open_weather/services/weather_api_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:geolocator/geolocator.dart';
 
 part 'async_weather_provider.g.dart';
 
 // Provider for the API Service (remains a regular Provider)
-final weatherApiService = Provider((ref) => WeatherApiService());
+final Provider<WeatherApiService> weatherApiService = Provider(
+  (ref) => WeatherApiService(),
+);
 
 // Provider for the Repository (remains a regular Provider)
-final weatherRepositoryProvider = Provider((ref) {
+final Provider<WeatherRepository> weatherRepositoryProvider = Provider((ref) {
   final apiService = ref.watch(weatherApiService);
   return WeatherRepository(apiService);
 });

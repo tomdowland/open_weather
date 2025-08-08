@@ -17,19 +17,17 @@ class SettingsPage extends ConsumerWidget {
       appBar: AppBar(title: Text(l10n!.settings), centerTitle: true),
       backgroundColor: Theme.of(context).primaryColor,
       body: Container(
-        padding: EdgeInsets.all(20) + EdgeInsets.only(top: 16),
+        padding: const EdgeInsets.all(20) + const EdgeInsets.only(top: 16),
         child: CustomScrollView(
           slivers: [
             SliverFillRemaining(
               hasScrollBody: false,
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Text(l10n.darkMode, style: TextStyle(fontSize: 24)),
-                      Spacer(),
+                      Text(l10n.darkMode, style: const TextStyle(fontSize: 24)),
+                      const Spacer(),
                       Switch(
                         value: settings.darkMode,
                         onChanged: (_) {
@@ -40,21 +38,23 @@ class SettingsPage extends ConsumerWidget {
                       ),
                     ],
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   Row(
                     children: [
                       Text(
                         l10n.languageSettings,
-                        style: TextStyle(fontSize: 24),
+                        style: const TextStyle(fontSize: 24),
                       ),
                       // SizedBox(width: 32),
-                      Spacer(),
+                      const Spacer(),
                       Expanded(
                         child: DropdownButtonFormField<Locale>(
                           value: settings.locale,
                           isDense: false,
-                          decoration: InputDecoration.collapsed(hintText: ''),
-                          icon: Icon(
+                          decoration: const InputDecoration.collapsed(
+                            hintText: '',
+                          ),
+                          icon: const Icon(
                             Icons.keyboard_arrow_down,
                             color: Colors.white,
                           ),

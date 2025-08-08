@@ -9,9 +9,9 @@ part 'home_page_provider.g.dart';
 @freezed
 abstract class FrontPage with _$FrontPage {
   factory FrontPage({
-    @Default(false) bool editing,
     required bool isBusy,
     required bool networkError,
+    @Default(false) bool editing,
     FullResult? weatherResults,
   }) = _FrontPage;
 }

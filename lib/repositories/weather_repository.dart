@@ -2,9 +2,8 @@ import 'package:open_weather/models/weather_model.dart';
 import 'package:open_weather/services/weather_api_service.dart';
 
 class WeatherRepository {
-  final WeatherApiService _apiService;
-
   WeatherRepository(this._apiService);
+  final WeatherApiService _apiService;
 
   Future<WeatherModel?> getWeather(String city) {
     return _apiService.fetchTodayWeather(city);

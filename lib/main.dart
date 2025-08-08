@@ -28,7 +28,7 @@ final GoRouter _router = GoRouter(
 );
 
 void main() {
-  runApp(ProviderScope(child: const MyApp()));
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends ConsumerWidget {
@@ -44,8 +44,8 @@ class MyApp extends ConsumerWidget {
       darkTheme: darkTheme,
       locale: settings.locale,
       themeMode: settings.darkMode ? ThemeMode.dark : ThemeMode.light,
-      supportedLocales: [Locale('en'), Locale('ja')],
-      localizationsDelegates: [
+      supportedLocales: const [Locale('en'), Locale('ja')],
+      localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,

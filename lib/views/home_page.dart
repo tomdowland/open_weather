@@ -13,7 +13,7 @@ class HomePage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final weather = ref.watch(homePageNotifierProvider);
     final l10n = AppLocalizations.of(context);
-    DateFormat date = DateFormat('MM/dd HH:mm');
+    final date = DateFormat('MM/dd HH:mm');
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColor,
       appBar: AppBar(
@@ -31,15 +31,16 @@ class HomePage extends HookConsumerWidget {
               ),
         centerTitle: true,
         actions: [
-          weather.editing
-              ? SizedBox()
-              : IconButton(
-                  onPressed: () {
-                    context.go('/settings');
-                    // move to settings page
-                  },
-                  icon: Icon(Icons.settings),
-                ),
+          if (weather.editing)
+            const SizedBox()
+          else
+            IconButton(
+              onPressed: () {
+                context.go('/settings');
+                // move to settings page
+              },
+              icon: const Icon(Icons.settings),
+            ),
           IconButton(
             onPressed: () {
               ref.read(homePageNotifierProvider.notifier).editCity();
@@ -49,28 +50,28 @@ class HomePage extends HookConsumerWidget {
         ],
       ),
       body: Padding(
-        padding: EdgeInsets.only(top: 56),
+        padding: const EdgeInsets.only(top: 56),
         child: Stack(
           children: [
             AnimatedOpacity(
               opacity: weather.isBusy && !weather.networkError ? 1 : 0,
-              duration: Duration(milliseconds: 100),
-              child: Center(child: CircularProgressIndicator()),
+              duration: const Duration(milliseconds: 100),
+              child: const Center(child: CircularProgressIndicator()),
             ),
             AnimatedOpacity(
               opacity: weather.isBusy && !weather.networkError ? 0 : 1,
-              duration: Duration(milliseconds: 300),
+              duration: const Duration(milliseconds: 300),
               child: weather.networkError
                   ? Center(
                       child: Padding(
-                        padding: const EdgeInsets.all(16.0),
+                        padding: const EdgeInsets.all(16),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
                               l10n!.networkError,
                               textAlign: TextAlign.center,
-                              style: TextStyle(fontSize: 24),
+                              style: const TextStyle(fontSize: 24),
                             ),
                           ],
                         ),
@@ -83,11 +84,11 @@ class HomePage extends HookConsumerWidget {
                           child: weather.weatherResults == null
                               ? Center(
                                   child: Padding(
-                                    padding: const EdgeInsets.all(16.0),
+                                    padding: const EdgeInsets.all(16),
                                     child: Text(
                                       l10n!.noResults,
                                       textAlign: TextAlign.center,
-                                      style: TextStyle(fontSize: 24),
+                                      style: const TextStyle(fontSize: 24),
                                     ),
                                   ),
                                 )
@@ -95,7 +96,7 @@ class HomePage extends HookConsumerWidget {
                                   children: [
                                     Text(
                                       l10n!.currentWeather,
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         fontSize: 24,
                                         fontWeight: FontWeight.w500,
                                       ),
@@ -103,7 +104,7 @@ class HomePage extends HookConsumerWidget {
                                     Container(
                                       decoration: BoxDecoration(
                                         color: Theme.of(context).cardColor,
-                                        borderRadius: BorderRadius.all(
+                                        borderRadius: const BorderRadius.all(
                                           Radius.circular(20),
                                         ),
                                       ),
@@ -121,7 +122,7 @@ class HomePage extends HookConsumerWidget {
                                           weather.weatherResults?.dateTime ?? 0,
                                         ),
                                       ),
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.w500,
                                       ),
@@ -132,23 +133,23 @@ class HomePage extends HookConsumerWidget {
                                               ?.weather
                                               ?.toTitleCase ??
                                           '',
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.w500,
                                       ),
                                     ),
                                     Text(
                                       '${weather.weatherResults?.temperature?.toStringAsFixed(0)}°C',
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.w500,
                                       ),
                                     ),
 
-                                    SizedBox(height: 50),
+                                    const SizedBox(height: 50),
                                     Text(
                                       l10n.weatherForecast,
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         fontSize: 24,
                                         fontWeight: FontWeight.w500,
                                       ),
@@ -171,11 +172,12 @@ class HomePage extends HookConsumerWidget {
                                               color: Theme.of(
                                                 context,
                                               ).cardColor,
-                                              borderRadius: BorderRadius.all(
-                                                Radius.circular(20),
-                                              ),
+                                              borderRadius:
+                                                  const BorderRadius.all(
+                                                    Radius.circular(20),
+                                                  ),
                                             ),
-                                            margin: EdgeInsets.all(8),
+                                            margin: const EdgeInsets.all(8),
                                             height: 160,
                                             width: 120,
                                             child: Column(
@@ -193,7 +195,7 @@ class HomePage extends HookConsumerWidget {
                                                       item?.dateTime ?? 0,
                                                     ),
                                                   ),
-                                                  style: TextStyle(
+                                                  style: const TextStyle(
                                                     fontSize: 16,
                                                   ),
                                                   textAlign: TextAlign.center,
@@ -201,14 +203,14 @@ class HomePage extends HookConsumerWidget {
                                                 Text(
                                                   item?.weather.toTitleCase ??
                                                       '',
-                                                  style: TextStyle(
+                                                  style: const TextStyle(
                                                     fontSize: 16,
                                                   ),
                                                   textAlign: TextAlign.center,
                                                 ),
                                                 Text(
                                                   '${item?.temperature.toStringAsFixed(0)}°C',
-                                                  style: TextStyle(
+                                                  style: const TextStyle(
                                                     fontSize: 16,
                                                   ),
                                                   textAlign: TextAlign.center,
