@@ -17,7 +17,7 @@ class AsyncSettings extends _$AsyncSettings {
 
   Future<bool> _getDarkModeSetting() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool('dark_mode') == true;
+    return prefs.getBool('dark_mode') ?? false;
   }
 
   Future<Locale> getLocale() async {

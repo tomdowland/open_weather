@@ -139,7 +139,8 @@ class HomePage extends HookConsumerWidget {
                                       ),
                                     ),
                                     Text(
-                                      '${weather.weatherResults?.temperature?.toStringAsFixed(0)}°C',
+                                      '${weather.weatherResults?.temperature?.
+                                      toStringAsFixed(0)}°C',
                                       style: const TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.w500,
@@ -191,7 +192,8 @@ class HomePage extends HookConsumerWidget {
                                                 ),
                                                 Text(
                                                   date.format(
-                                                    DateTime.fromMillisecondsSinceEpoch(
+                                                    DateTime.
+                                                    fromMillisecondsSinceEpoch(
                                                       item?.dateTime ?? 0,
                                                     ),
                                                   ),
@@ -209,7 +211,8 @@ class HomePage extends HookConsumerWidget {
                                                   textAlign: TextAlign.center,
                                                 ),
                                                 Text(
-                                                  '${item?.temperature.toStringAsFixed(0)}°C',
+                                                  '${item?.temperature.
+                                                  toStringAsFixed(0)}°C',
                                                   style: const TextStyle(
                                                     fontSize: 16,
                                                   ),

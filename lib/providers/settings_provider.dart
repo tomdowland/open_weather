@@ -31,12 +31,12 @@ class SettingsNotifier extends _$SettingsNotifier {
   Future<void> toggleDarkMode() async {
     state = state.copyWith(darkMode: !state.darkMode);
     final prefs = await SharedPreferences.getInstance();
-    prefs.setBool('dark_mode', state.darkMode);
+    await prefs.setBool('dark_mode', state.darkMode);
   }
 
   Future<void> setLocale(Locale newLocale) async {
     state = state.copyWith(locale: newLocale);
     final prefs = await SharedPreferences.getInstance();
-    prefs.setString('locale', state.locale?.languageCode ?? '');
+    await prefs.setString('locale', state.locale?.languageCode ?? '');
   }
 }

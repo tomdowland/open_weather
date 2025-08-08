@@ -58,9 +58,11 @@ class AsyncWeather extends _$AsyncWeather {
     // Test if location services are enabled.
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      // Location services are not enabled, don't continue accessing the position.
+      // Location services are not enabled,
+      // don't continue accessing the position.
       return Future.error(
-        'Location services are disabled. Please enable them in your device settings.',
+        'Location services are disabled. '
+            'Please enable them in your device settings.',
       );
     }
 
@@ -68,9 +70,11 @@ class AsyncWeather extends _$AsyncWeather {
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        // Permissions are denied, next time you could try requesting permissions again
+        // Permissions are denied, next time you could
+        // try requesting permissions again
         return Future.error(
-          'Location permissions are denied. Please grant them to get weather for your current location.',
+          'Location permissions are denied. '
+              'Please grant them to get weather for your current location.',
         );
       }
     }
@@ -78,11 +82,13 @@ class AsyncWeather extends _$AsyncWeather {
     if (permission == LocationPermission.deniedForever) {
       // Permissions are denied forever, handle appropriately.
       return Future.error(
-        'Location permissions are permanently denied, we cannot request permissions. Please enable them manually in app settings.',
+        'Location permissions are permanently denied, we cannot request '
+            'permissions. Please enable them manually in app settings.',
       );
     }
 
-    // When we reach here, permissions are granted and we can continue accessing the position of the device.
+    // When we reach here, permissions are granted and we can continue accessing
+    // the position of the device.
     try {
       return await Geolocator.getCurrentPosition();
     } on DioException {

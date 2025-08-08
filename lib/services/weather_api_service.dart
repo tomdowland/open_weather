@@ -12,7 +12,7 @@ class WeatherApiService {
     try {
       final prefs = await SharedPreferences.getInstance();
       final language = prefs.getString('locale');
-      final response = await _dio.get(
+      final response = await _dio.get<Map<String, dynamic>>(
         '$_url/weather',
         queryParameters: {
           'q': city,
@@ -22,15 +22,16 @@ class WeatherApiService {
         },
       );
       if (response.statusCode == 200) {
-        final main = response.data['main'];
-        final weather = response.data['weather'][0];
+        final main = response.data?['main'] as Map;
+        final weather = (response.data?['weather']as List)[0]
+        as Map<String, dynamic>;
 
         return WeatherModel(
-          city: response.data['name'],
-          temperature: main['temp'].toDouble(),
-          weather: weather['description'],
-          icon: weather['icon'],
-          dateTime: response.data['dt'] * 1000,
+          city: response.data!['name'].toString(),
+          temperature: main['temp'] as double,
+          weather: weather['description'] as String,
+          icon: weather['icon'] as String,
+          dateTime: (response.data!['dt'] as int) * 1000,
         );
       }
       if (response.statusCode == 404) {
@@ -46,7 +47,7 @@ class WeatherApiService {
     try {
       final prefs = await SharedPreferences.getInstance();
       final language = prefs.getString('locale');
-      final response = await _dio.get(
+      final response = await _dio.get<Map<String, List<Map<String, dynamic>>>>(
         '$_url/forecast',
         queryParameters: {
           'q': cityName,
@@ -56,18 +57,19 @@ class WeatherApiService {
         },
       );
       if (response.statusCode == 200) {
-        final list = response.data['list'];
+        final list = response.data!['list'];
         final result = <WeatherModel>[];
-        for (var i = 0; i < list.length - 1; i++) {
-          final main = list[i]['main'];
-          final weather = list[i]['weather'][0];
-          final dateTime = list[i]['dt'] * 1000;
+        for (var i = 0; i < list!.length - 1; i++) {
+          final main = list[i]['main'] as Map<String, dynamic>;
+          final weather = (list[i]['weather'] as List)[0]
+          as Map<String, String>;
+          final dateTime = (list[i]['dt'] as int) * 1000;
 
           result.add(
             WeatherModel(
               // city: response.data['name'],
-              temperature: main['temp'].toDouble(),
-              weather: weather['description'],
+              temperature: main['temp'] as double,
+              weather: weather['description'] ?? '',
               icon: weather['icon'],
               dateTime: dateTime,
             ),
@@ -91,7 +93,7 @@ class WeatherApiService {
     try {
       final prefs = await SharedPreferences.getInstance();
       final language = prefs.getString('locale');
-      final response = await _dio.get(
+      final response = await _dio.get<Map<String, dynamic>>(
         '$_url/weather',
         queryParameters: {
           'lat': latitude,
@@ -102,15 +104,16 @@ class WeatherApiService {
         },
       );
       if (response.statusCode == 200) {
-        final main = response.data['main'];
-        final weather = response.data['weather'][0];
+        final main = response.data!['main'] as Map<String, dynamic>;
+        final weather = (response.data!['weather']
+        as List<Map<String, String>>)[0];
 
         return WeatherModel(
-          city: response.data['name'],
-          temperature: main['temp'].toDouble(),
-          weather: weather['description'],
+          city: response.data!['name'] as String,
+          temperature: main['temp'] as double,
+          weather: weather['description']!,
           icon: weather['icon'],
-          dateTime: response.data['dt'] * 1000,
+          dateTime: (response.data!['dt'] as int) * 1000,
         );
       }
       if (response.statusCode == 404) {
