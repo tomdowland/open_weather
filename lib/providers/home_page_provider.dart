@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:open_weather/models/full_result_model.dart';
+import 'package:open_weather/models/current_weather.dart';
+import 'package:open_weather/models/forecast_data.dart';
 import 'package:open_weather/providers/async_weather_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'home_page_provider.freezed.dart';
@@ -12,7 +13,8 @@ abstract class FrontPage with _$FrontPage {
     required bool isBusy,
     required bool networkError,
     @Default(false) bool editing,
-    FullResult? weatherResults,
+    ForecastData? weatherResults,
+    CurrentWeather? currentWeather,
   }) = _FrontPage;
 }
 
@@ -20,16 +22,17 @@ abstract class FrontPage with _$FrontPage {
 class HomePageNotifier extends _$HomePageNotifier {
   @override
   FrontPage build() {
-    final weather = ref.watch(asyncWeatherProvider);
+    final asyncWeather = ref.watch(asyncWeatherProvider);
     try {
       return FrontPage(
-        weatherResults: weather.value,
-        isBusy: weather.isLoading,
-        networkError: weather.hasError,
+        weatherResults: asyncWeather.value?.fiveDayForecast,
+        currentWeather: asyncWeather.value?.currentWeather,
+        isBusy: asyncWeather.isLoading,
+        networkError: asyncWeather.hasError,
       );
     } on DioException catch (e) {
       if (e.response == null) {
-        return FrontPage(isBusy: false, networkError: weather.hasError);
+        return FrontPage(isBusy: false, networkError: asyncWeather.hasError);
       } else {
         return FrontPage(isBusy: false, networkError: false);
       }

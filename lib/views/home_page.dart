@@ -26,7 +26,7 @@ class HomePage extends HookConsumerWidget {
                     .searchCity,
               )
             : Text(
-                weather.weatherResults?.city ?? l10n!.weatherAppTitle,
+                weather.weatherResults?.city?.name ?? l10n!.weatherAppTitle,
                 textAlign: TextAlign.center,
               ),
         centerTitle: true,
@@ -112,14 +112,14 @@ class HomePage extends HookConsumerWidget {
                                         height: 150,
                                         width: 150,
                                         child: Image.network(
-                                          'https://openweathermap.org/img/wn/${weather.weatherResults?.icon}@2x.png',
+                                          'https://openweathermap.org/img/wn/${weather.currentWeather?.weather?[0].icon}@2x.png',
                                         ),
                                       ),
                                     ),
                                     Text(
                                       date.format(
                                         DateTime.fromMillisecondsSinceEpoch(
-                                          weather.weatherResults?.dateTime ?? 0,
+                                          weather.currentWeather!.dt! * 1000,
                                         ),
                                       ),
                                       style: const TextStyle(
@@ -129,8 +129,9 @@ class HomePage extends HookConsumerWidget {
                                     ),
                                     Text(
                                       weather
-                                              .weatherResults
-                                              ?.weather
+                                              .currentWeather
+                                              ?.weather?[0]
+                                              .description
                                               ?.toTitleCase ??
                                           '',
                                       style: const TextStyle(
@@ -139,8 +140,8 @@ class HomePage extends HookConsumerWidget {
                                       ),
                                     ),
                                     Text(
-                                      '${weather.weatherResults?.temperature?.
-                                      toStringAsFixed(0)}°C',
+                                      '${weather.currentWeather?.main?.temp
+                                          ?.toStringAsFixed(0)}°C',
                                       style: const TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.w500,
@@ -162,12 +163,12 @@ class HomePage extends HookConsumerWidget {
                                         scrollDirection: Axis.horizontal,
                                         itemCount: weather
                                             .weatherResults
-                                            ?.forecast
+                                            ?.weatherList
                                             ?.length,
                                         itemBuilder: (_, __) {
                                           final item = weather
                                               .weatherResults
-                                              ?.forecast?[__];
+                                              ?.weatherList?[__];
                                           return Container(
                                             decoration: BoxDecoration(
                                               color: Theme.of(
@@ -187,14 +188,14 @@ class HomePage extends HookConsumerWidget {
                                                   height: 40,
                                                   width: 40,
                                                   child: Image.network(
-                                                    'https://openweathermap.org/img/wn/${item?.icon}@2x.png',
+                                                    'https://openweathermap.org/img/wn/${item?.weather?[0].icon}@2x.png',
                                                   ),
                                                 ),
                                                 Text(
                                                   date.format(
-                                                    DateTime.
-                                                    fromMillisecondsSinceEpoch(
-                                                      item?.dateTime ?? 0,
+                                                    DateTime
+                                                        .fromMillisecondsSinceEpoch(
+                                                      item!.dt! * 1000,
                                                     ),
                                                   ),
                                                   style: const TextStyle(
@@ -203,7 +204,10 @@ class HomePage extends HookConsumerWidget {
                                                   textAlign: TextAlign.center,
                                                 ),
                                                 Text(
-                                                  item?.weather.toTitleCase ??
+                                                  item
+                                                          .weather?[0]
+                                                          .description
+                                                          ?.toTitleCase ??
                                                       '',
                                                   style: const TextStyle(
                                                     fontSize: 16,
@@ -211,8 +215,8 @@ class HomePage extends HookConsumerWidget {
                                                   textAlign: TextAlign.center,
                                                 ),
                                                 Text(
-                                                  '${item?.temperature.
-                                                  toStringAsFixed(0)}°C',
+                                                  '${item.main?.temp
+                                                      ?.toStringAsFixed(0)}°C',
                                                   style: const TextStyle(
                                                     fontSize: 16,
                                                   ),

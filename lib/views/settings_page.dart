@@ -67,7 +67,7 @@ class SettingsPage extends ConsumerWidget {
                               await ref
                                   .read(homePageNotifierProvider.notifier)
                                   .searchCity(
-                                    weather.weatherResults?.city ?? '',
+                                    weather.weatherResults?.city?.name ?? '',
                                   );
                             }
                           },

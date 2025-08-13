@@ -1,12 +1,15 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:open_weather/models/full_result_model.dart';
+import 'package:open_weather/models/current_weather.dart';
+import 'package:open_weather/models/forecast_data.dart';
 import 'package:open_weather/repositories/weather_repository.dart';
 import 'package:open_weather/services/weather_api_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'async_weather_provider.g.dart';
+part 'async_weather_provider.freezed.dart';
 
 // Provider for the API Service (remains a regular Provider)
 final Provider<WeatherApiService> weatherApiService = Provider(
@@ -19,32 +22,34 @@ final Provider<WeatherRepository> weatherRepositoryProvider = Provider((ref) {
   return WeatherRepository(apiService);
 });
 
+@freezed
+abstract class AsyncWeatherModel with _$AsyncWeatherModel {
+  const factory AsyncWeatherModel({
+    ForecastData? fiveDayForecast,
+    CurrentWeather? currentWeather,
+  }) = _AsyncWeatherModel;
+}
+
 @riverpod
 class AsyncWeather extends _$AsyncWeather {
   @override
-  Future<FullResult?> build() async {
+  Future<AsyncWeatherModel?> build() async {
     // Attempt to fetch current location weather on startup
     try {
       final position = await _determinePosition();
       final repository = ref.read(weatherRepositoryProvider);
-      final weather = await repository.getLocalWeather(
+      final current = await repository.getLocalWeather(
         latitude: position.latitude,
         longitude: position.longitude,
       );
       final forecast = await ref
           .read(weatherRepositoryProvider)
-          .getForecast(weather?.city ?? '');
-
-      return FullResult(
-        city: weather?.city,
-        country: weather?.country,
-        weather: weather?.weather,
-        temperature: weather?.temperature,
-        dateTime: weather?.dateTime,
-        icon: weather?.icon,
-        forecast: forecast,
+          .fetchWeatherForecast(current?.name ?? '');
+      return AsyncWeatherModel(
+        currentWeather: current,
+        fiveDayForecast: forecast,
       );
-    } on DioException {
+    } catch (e) {
       rethrow;
     }
   }
@@ -62,7 +67,7 @@ class AsyncWeather extends _$AsyncWeather {
       // don't continue accessing the position.
       return Future.error(
         'Location services are disabled. '
-            'Please enable them in your device settings.',
+        'Please enable them in your device settings.',
       );
     }
 
@@ -74,7 +79,7 @@ class AsyncWeather extends _$AsyncWeather {
         // try requesting permissions again
         return Future.error(
           'Location permissions are denied. '
-              'Please grant them to get weather for your current location.',
+          'Please grant them to get weather for your current location.',
         );
       }
     }
@@ -83,7 +88,7 @@ class AsyncWeather extends _$AsyncWeather {
       // Permissions are denied forever, handle appropriately.
       return Future.error(
         'Location permissions are permanently denied, we cannot request '
-            'permissions. Please enable them manually in app settings.',
+        'permissions. Please enable them manually in app settings.',
       );
     }
 
@@ -97,25 +102,16 @@ class AsyncWeather extends _$AsyncWeather {
   }
 
   // Method to fetch weather by city name (can be triggered by user input)
-  Future<FullResult?> fetchWeatherByCity(String city) async {
+  Future<ForecastData?> fetchWeatherByCity(String city) async {
     try {
-      final repository = ref.read(weatherRepositoryProvider);
-      final weather = await repository.getWeather(city);
-      final forecast = await repository.getForecast(city);
-      return FullResult(
-        city: weather?.city,
-        country: weather?.country,
-        weather: weather?.weather,
-        temperature: weather?.temperature,
-        dateTime: weather?.dateTime,
-        icon: weather?.icon,
-        forecast: forecast,
-      );
+
+      final result = await ref
+          .read(weatherRepositoryProvider)
+          .fetchWeatherForecast(city);
+      return result;
     } on DioException catch (e) {
-      if (e.response == null) {
         rethrow;
       }
     }
-    return null;
-  }
+
 }
