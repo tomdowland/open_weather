@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:open_weather/extensions/string.dart';
 import 'package:open_weather/l10n/app_localizations.dart';
+import 'package:open_weather/models/enum/error.dart';
 import 'package:open_weather/providers/home_page_provider.dart';
 
 class HomePage extends HookConsumerWidget {
@@ -14,19 +16,24 @@ class HomePage extends HookConsumerWidget {
     final weather = ref.watch(homePageNotifierProvider);
     final l10n = AppLocalizations.of(context);
     final date = DateFormat('MM/dd HH:mm');
+    final searchController = useTextEditingController();
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColor,
       appBar: AppBar(
         title: weather.editing
             ? TextField(
                 autofocus: true,
+                controller: searchController,
                 decoration: InputDecoration(hintText: l10n!.enterCityHint),
                 onSubmitted: ref
                     .read(homePageNotifierProvider.notifier)
                     .searchCity,
               )
             : Text(
-                weather.weatherResults?.city?.name ?? l10n!.weatherAppTitle,
+                weather.weatherResults?.city?.name ??
+                    (searchController.text.isNotEmpty
+                        ? searchController.text
+                        : l10n!.weatherAppTitle),
                 textAlign: TextAlign.center,
               ),
         centerTitle: true,
@@ -43,6 +50,7 @@ class HomePage extends HookConsumerWidget {
             ),
           IconButton(
             onPressed: () {
+              searchController.clear();
               ref.read(homePageNotifierProvider.notifier).editCity();
             },
             icon: Icon(weather.editing ? Icons.cancel : Icons.search),
@@ -54,24 +62,72 @@ class HomePage extends HookConsumerWidget {
         child: Stack(
           children: [
             AnimatedOpacity(
-              opacity: weather.isBusy && !weather.networkError ? 1 : 0,
+              opacity: weather.isBusy && !weather.hasError ? 1 : 0,
               duration: const Duration(milliseconds: 100),
               child: const Center(child: CircularProgressIndicator()),
             ),
             AnimatedOpacity(
-              opacity: weather.isBusy && !weather.networkError ? 0 : 1,
+              opacity: weather.isBusy && !weather.hasError ? 0 : 1,
               duration: const Duration(milliseconds: 300),
-              child: weather.networkError
+              child: weather.hasError
                   ? Center(
                       child: Padding(
                         padding: const EdgeInsets.all(16),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text(
-                              l10n!.networkError,
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(fontSize: 24),
+                            switch (weather.errorType) {
+                              RequestError.requestTimeout => Text(
+                                l10n!.timeout,
+                                // l10n!.networkError,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(fontSize: 24),
+                              ),
+                              RequestError.locationPermissionsDenied => Text(
+                                l10n!.locationPermissionsDenied,
+                                // l10n!.networkError,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(fontSize: 24),
+                              ),
+                              RequestError
+                                  .locationPermissionsPermanentlyDenied =>
+                                Text(
+                                  l10n!.locationPermissionsPermanentlyDenied,
+                                  // l10n!.networkError,
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(fontSize: 24),
+                                ),
+                              RequestError.locationServicesDisabled => Text(
+                                l10n!.locationServicesDisabled,
+                                // l10n!.networkError,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(fontSize: 24),
+                              ),
+                              RequestError.networkError => Text(
+                                l10n!.networkError,
+                                // l10n!.networkError,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(fontSize: 24),
+                              ),
+                              RequestError.notFound => Text(
+                                l10n!.noResults,
+                                // l10n!.networkError,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(fontSize: 24),
+                              ),
+                              _ => const Text(''),
+                            },
+
+                            const SizedBox(
+                              height: 50,
+                            ),
+                            TextButton(
+                              child: const Text(
+                                'Retry',
+                              ), //TODO customise button
+                              onPressed: () => ref
+                                  .read(homePageNotifierProvider.notifier)
+                                  .searchCity(searchController.text),
                             ),
                           ],
                         ),
@@ -83,15 +139,68 @@ class HomePage extends HookConsumerWidget {
                           hasScrollBody: false,
                           child: weather.weatherResults == null
                               ? Center(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(16),
-                                    child: Text(
-                                      l10n!.noResults,
+                            child: Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  switch (weather.errorType) {
+                                    RequestError.requestTimeout => Text(
+                                      l10n!.timeout,
+                                      // l10n!.networkError,
                                       textAlign: TextAlign.center,
                                       style: const TextStyle(fontSize: 24),
                                     ),
+                                    RequestError.locationPermissionsDenied => Text(
+                                      l10n!.locationPermissionsDenied,
+                                      // l10n!.networkError,
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(fontSize: 24),
+                                    ),
+                                    RequestError
+                                        .locationPermissionsPermanentlyDenied =>
+                                        Text(
+                                          l10n!.locationPermissionsPermanentlyDenied,
+                                          // l10n!.networkError,
+                                          textAlign: TextAlign.center,
+                                          style: const TextStyle(fontSize: 24),
+                                        ),
+                                    RequestError.locationServicesDisabled => Text(
+                                      l10n!.locationServicesDisabled,
+                                      // l10n!.networkError,
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(fontSize: 24),
+                                    ),
+                                    RequestError.networkError => Text(
+                                      l10n!.networkError,
+                                      // l10n!.networkError,
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(fontSize: 24),
+                                    ),
+                                    RequestError.notFound => Text(
+                                      l10n!.noResults,
+                                      // l10n!.networkError,
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(fontSize: 24),
+                                    ),
+                                    _ => const Text(''),
+                                  },
+
+                                  const SizedBox(
+                                    height: 50,
                                   ),
-                                )
+                                  TextButton(
+                                    child: const Text(
+                                      'Retry',
+                                    ), //TODO customise button
+                                    onPressed: () => ref
+                                        .read(homePageNotifierProvider.notifier)
+                                        .searchCity(searchController.text),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
                               : Column(
                                   children: [
                                     Text(
@@ -140,8 +249,7 @@ class HomePage extends HookConsumerWidget {
                                       ),
                                     ),
                                     Text(
-                                      '${weather.currentWeather?.main?.temp
-                                          ?.toStringAsFixed(0)}°C',
+                                      '${weather.currentWeather?.main?.temp?.toStringAsFixed(0)}°C',
                                       style: const TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.w500,
@@ -193,8 +301,7 @@ class HomePage extends HookConsumerWidget {
                                                 ),
                                                 Text(
                                                   date.format(
-                                                    DateTime
-                                                        .fromMillisecondsSinceEpoch(
+                                                    DateTime.fromMillisecondsSinceEpoch(
                                                       item!.dt! * 1000,
                                                     ),
                                                   ),
@@ -215,8 +322,7 @@ class HomePage extends HookConsumerWidget {
                                                   textAlign: TextAlign.center,
                                                 ),
                                                 Text(
-                                                  '${item.main?.temp
-                                                      ?.toStringAsFixed(0)}°C',
+                                                  '${item.main?.temp?.toStringAsFixed(0)}°C',
                                                   style: const TextStyle(
                                                     fontSize: 16,
                                                   ),

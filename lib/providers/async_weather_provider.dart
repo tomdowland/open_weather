@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:open_weather/models/current_weather.dart';
+import 'package:open_weather/models/enum/error.dart';
 import 'package:open_weather/models/forecast_data.dart';
 import 'package:open_weather/repositories/weather_repository.dart';
 import 'package:open_weather/services/weather_api_service.dart';
@@ -27,6 +28,8 @@ abstract class AsyncWeatherModel with _$AsyncWeatherModel {
   const factory AsyncWeatherModel({
     ForecastData? fiveDayForecast,
     CurrentWeather? currentWeather,
+    String? errorMessage,
+    RequestError? errorType,
   }) = _AsyncWeatherModel;
 }
 
@@ -49,7 +52,35 @@ class AsyncWeather extends _$AsyncWeather {
         currentWeather: current,
         fiveDayForecast: forecast,
       );
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 404) {
+        return const AsyncWeatherModel(errorType: RequestError.notFound);
+      }
+      if (e.response?.statusCode == 400) {
+        return const AsyncWeatherModel(errorType: RequestError.networkError);
+      }
     } catch (e) {
+      if (e.toString().contains('disabled')) {
+        return const AsyncWeatherModel(
+          errorType: RequestError.locationServicesDisabled,
+        );
+      }
+      if (e.toString().contains('LocationPermission.deniedForever')) {
+        return const AsyncWeatherModel(
+          errorType: RequestError.locationPermissionsPermanentlyDenied,
+        );
+      }
+      if (e.toString().contains('timeout')) {
+        return const AsyncWeatherModel(
+          errorType: RequestError.requestTimeout,
+        );
+      }
+      if (e.toString().contains('LocationPermission.denied')) {
+        return const AsyncWeatherModel(
+          errorType: RequestError.locationPermissionsDenied,
+        );
+      }
+
       rethrow;
     }
   }
@@ -60,14 +91,15 @@ class AsyncWeather extends _$AsyncWeather {
     bool serviceEnabled;
     LocationPermission permission;
 
+    const settings = LocationSettings(timeLimit: Duration(seconds: 10));
+    print('searching location');
     // Test if location services are enabled.
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       // Location services are not enabled,
       // don't continue accessing the position.
       return Future.error(
-        'Location services are disabled. '
-        'Please enable them in your device settings.',
+        'Location services are disabled.',
       );
     }
 
@@ -78,8 +110,7 @@ class AsyncWeather extends _$AsyncWeather {
         // Permissions are denied, next time you could
         // try requesting permissions again
         return Future.error(
-          'Location permissions are denied. '
-          'Please grant them to get weather for your current location.',
+          'LocationPermission.denied',
         );
       }
     }
@@ -87,31 +118,64 @@ class AsyncWeather extends _$AsyncWeather {
     if (permission == LocationPermission.deniedForever) {
       // Permissions are denied forever, handle appropriately.
       return Future.error(
-        'Location permissions are permanently denied, we cannot request '
-        'permissions. Please enable them manually in app settings.',
+        'LocationPermission.deniedForever',
       );
     }
 
     // When we reach here, permissions are granted and we can continue accessing
     // the position of the device.
     try {
-      return await Geolocator.getCurrentPosition();
-    } on DioException {
+      return await Geolocator.getCurrentPosition(locationSettings: settings);
+    } catch (e) {
+      print(e);
       rethrow;
     }
   }
 
   // Method to fetch weather by city name (can be triggered by user input)
-  Future<ForecastData?> fetchWeatherByCity(String city) async {
+  Future<AsyncWeatherModel?> fetchWeatherByCity(String city) async {
     try {
-
-      final result = await ref
+      final forecast = await ref
           .read(weatherRepositoryProvider)
           .fetchWeatherForecast(city);
-      return result;
+      final current = await ref
+          .read(weatherRepositoryProvider)
+          .getCurrentWeather(city);
+      return AsyncWeatherModel(
+        fiveDayForecast: forecast,
+        currentWeather: current,
+      );
     } on DioException catch (e) {
-        rethrow;
+      if (e.response?.statusCode == 404) {
+        return const AsyncWeatherModel(errorType: RequestError.notFound);
       }
-    }
+      if (e.response?.statusCode == 400) {
+        return const AsyncWeatherModel(errorType: RequestError.networkError);
+      }
+      rethrow;
+    } catch (e) {
+      if (e.toString().contains('disabled')) {
+        return const AsyncWeatherModel(
+          errorType: RequestError.locationServicesDisabled,
+        );
+      }
+      if (e.toString().contains('LocationPermission.deniedForever')) {
+        return const AsyncWeatherModel(
+          errorType: RequestError.locationPermissionsPermanentlyDenied,
+        );
+      }
+      if (e.toString().contains('timeout')) {
+        return const AsyncWeatherModel(
+          errorType: RequestError.requestTimeout,
+        );
+      }
+      if (e.toString().contains('LocationPermission.denied')) {
+        return const AsyncWeatherModel(
+          errorType: RequestError.locationPermissionsDenied,
+        );
+      }
 
+      rethrow;
+    }
+  }
 }

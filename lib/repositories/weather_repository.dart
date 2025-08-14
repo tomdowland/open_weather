@@ -10,8 +10,8 @@ class WeatherRepository {
     return _apiService.fetchWeatherData(city);
   }
 
-  Future<CurrentWeather?> getWeather(String city) {
-    return _apiService.fetchTodayWeather(city);
+  Future<CurrentWeather?> getCurrentWeather(String city) {
+    return _apiService.fetchCurrentWeather(city);
   }
 
   // Future<List<WeatherModel>?> getForecast(String city) {

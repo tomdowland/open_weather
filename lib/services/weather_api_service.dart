@@ -28,7 +28,7 @@ class WeatherApiService {
     }
   }
 
-  Future<CurrentWeather?> fetchTodayWeather(String city) async {
+  Future<CurrentWeather?> fetchCurrentWeather(String city) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final language = prefs.getString('locale');
