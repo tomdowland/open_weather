@@ -14,5 +14,5 @@
   "locationPermissionsPermanentlyDenied": "位置情報の許可が永久に拒否されています。アプリの設定で手動で有効にしてください。",
   "networkError": "ネットワークエラーが発生しました。もう一度検索してみて下さい。",
   "noResults": "入力した都市名で予報データが見つかりませんでした。",
-  "timeout": "Sorry, your request timed out. Please check your connection and try again later."
+  "timeout": "ネットワーク エラーのためタイムアウトしました。もう一度検索してみて下さい。"
 }

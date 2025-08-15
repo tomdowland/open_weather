@@ -59,6 +59,12 @@ class AsyncWeather extends _$AsyncWeather {
       if (e.response?.statusCode == 400) {
         return const AsyncWeatherModel(errorType: RequestError.networkError);
       }
+      if (e.toString().contains('Timeout')) {
+        return const AsyncWeatherModel(
+          errorType: RequestError.requestTimeout,
+        );
+      }
+      rethrow;
     } catch (e) {
       if (e.toString().contains('disabled')) {
         return const AsyncWeatherModel(
@@ -70,7 +76,7 @@ class AsyncWeather extends _$AsyncWeather {
           errorType: RequestError.locationPermissionsPermanentlyDenied,
         );
       }
-      if (e.toString().contains('timeout')) {
+      if (e.toString().contains('Timeout')) {
         return const AsyncWeatherModel(
           errorType: RequestError.requestTimeout,
         );
@@ -80,7 +86,6 @@ class AsyncWeather extends _$AsyncWeather {
           errorType: RequestError.locationPermissionsDenied,
         );
       }
-
       rethrow;
     }
   }
@@ -92,7 +97,6 @@ class AsyncWeather extends _$AsyncWeather {
     LocationPermission permission;
 
     const settings = LocationSettings(timeLimit: Duration(seconds: 10));
-    print('searching location');
     // Test if location services are enabled.
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
@@ -127,7 +131,6 @@ class AsyncWeather extends _$AsyncWeather {
     try {
       return await Geolocator.getCurrentPosition(locationSettings: settings);
     } catch (e) {
-      print(e);
       rethrow;
     }
   }
