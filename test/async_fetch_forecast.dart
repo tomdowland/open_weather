@@ -1,6 +1,5 @@
 import 'dart:io' as io;
 
-import 'package:dio/dio.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -86,7 +85,7 @@ void main() async {
           .fetchWeatherByCity('q');
 
       expect(
-        container.read(asyncWeatherProvider.notifier).fetchWeatherByCity('q'),
+        subscription.read().then((_)=> container.read(asyncWeatherProvider.notifier).fetchWeatherByCity('q')),
         completion(const AsyncWeatherModel(errorType: RequestError.notFound)),
       );
     });
