@@ -36,9 +36,6 @@ class HomePageNotifier extends _$HomePageNotifier {
         errorMessage: asyncWeather.value?.errorMessage,
       );
     } catch (e) {
-      print(
-        'async error: ${ref.watch(asyncWeatherProvider).hasError ?? 'none'}',
-      );
       return FrontPage(
         isBusy: false,
         hasError: asyncWeather.hasError,
@@ -70,7 +67,6 @@ class HomePageNotifier extends _$HomePageNotifier {
           isBusy: false,
           hasError: true,
           errorType: asyncWeather.value?.errorType,
-          errorMessage: '404 exception: ${e.message}',
         );
       } else {
         state = state.copyWith(
@@ -78,9 +74,9 @@ class HomePageNotifier extends _$HomePageNotifier {
           isBusy: false,
           hasError: false,
           errorType: asyncWeather.value?.errorType,
-          errorMessage: 'non 404 exepction ${e.message}',
         );
       }
+      rethrow;
     }
   }
 

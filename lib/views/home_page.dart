@@ -79,13 +79,11 @@ class HomePage extends HookConsumerWidget {
                             switch (weather.errorType) {
                               RequestError.requestTimeout => Text(
                                 l10n!.timeout,
-                                // l10n!.networkError,
                                 textAlign: TextAlign.center,
                                 style: const TextStyle(fontSize: 24),
                               ),
                               RequestError.locationPermissionsDenied => Text(
                                 l10n!.locationPermissionsDenied,
-                                // l10n!.networkError,
                                 textAlign: TextAlign.center,
                                 style: const TextStyle(fontSize: 24),
                               ),
@@ -93,42 +91,27 @@ class HomePage extends HookConsumerWidget {
                                   .locationPermissionsPermanentlyDenied =>
                                 Text(
                                   l10n!.locationPermissionsPermanentlyDenied,
-                                  // l10n!.networkError,
                                   textAlign: TextAlign.center,
                                   style: const TextStyle(fontSize: 24),
                                 ),
                               RequestError.locationServicesDisabled => Text(
                                 l10n!.locationServicesDisabled,
-                                // l10n!.networkError,
                                 textAlign: TextAlign.center,
                                 style: const TextStyle(fontSize: 24),
                               ),
                               RequestError.networkError => Text(
                                 l10n!.networkError,
-                                // l10n!.networkError,
                                 textAlign: TextAlign.center,
                                 style: const TextStyle(fontSize: 24),
                               ),
                               RequestError.notFound => Text(
                                 l10n!.noResults,
-                                // l10n!.networkError,
                                 textAlign: TextAlign.center,
                                 style: const TextStyle(fontSize: 24),
                               ),
                               _ => const Text(''),
                             },
 
-                            const SizedBox(
-                              height: 50,
-                            ),
-                            TextButton(
-                              child: const Text(
-                                'Retry',
-                              ), //TODO customise button
-                              onPressed: () => ref
-                                  .read(homePageNotifierProvider.notifier)
-                                  .searchCity(searchController.text),
-                            ),
                           ],
                         ),
                       ),
@@ -145,15 +128,28 @@ class HomePage extends HookConsumerWidget {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   switch (weather.errorType) {
-                                    RequestError.requestTimeout => Text(
-                                      l10n!.timeout,
-                                      // l10n!.networkError,
-                                      textAlign: TextAlign.center,
-                                      style: const TextStyle(fontSize: 24),
+                                    RequestError.requestTimeout => Column(
+                                      children: [
+                                        Text(
+                                          l10n!.timeout,
+                                          textAlign: TextAlign.center,
+                                          style: const TextStyle(fontSize: 24),
+                                        ),
+                                        const SizedBox(
+                                          height: 50,
+                                        ),
+                                        TextButton(
+                                          child: Text(
+                                            l10n.retry,
+                                          ), // TODOcustomise button
+                                          onPressed: () => ref
+                                              .read(homePageNotifierProvider.notifier)
+                                              .searchCity(searchController.text),
+                                        ),
+                                      ],
                                     ),
                                     RequestError.locationPermissionsDenied => Text(
                                       l10n!.locationPermissionsDenied,
-                                      // l10n!.networkError,
                                       textAlign: TextAlign.center,
                                       style: const TextStyle(fontSize: 24),
                                     ),
@@ -161,42 +157,41 @@ class HomePage extends HookConsumerWidget {
                                         .locationPermissionsPermanentlyDenied =>
                                         Text(
                                           l10n!.locationPermissionsPermanentlyDenied,
-                                          // l10n!.networkError,
                                           textAlign: TextAlign.center,
                                           style: const TextStyle(fontSize: 24),
                                         ),
                                     RequestError.locationServicesDisabled => Text(
                                       l10n!.locationServicesDisabled,
-                                      // l10n!.networkError,
                                       textAlign: TextAlign.center,
                                       style: const TextStyle(fontSize: 24),
                                     ),
-                                    RequestError.networkError => Text(
-                                      l10n!.networkError,
-                                      // l10n!.networkError,
-                                      textAlign: TextAlign.center,
-                                      style: const TextStyle(fontSize: 24),
+                                    RequestError.networkError => Column(
+                                      children: [
+                                        Text(
+                                          l10n!.networkError,
+                                          textAlign: TextAlign.center,
+                                          style: const TextStyle(fontSize: 24),
+                                        ),
+                                        const SizedBox(
+                                          height: 50,
+                                        ),
+                                        TextButton(
+                                          child: Text(
+                                              l10n.retry,
+                                          ), // TODOcustomise button
+                                          onPressed: () => ref
+                                              .read(homePageNotifierProvider.notifier)
+                                              .searchCity(searchController.text),
+                                        ),
+                                      ],
                                     ),
                                     RequestError.notFound => Text(
                                       l10n!.noResults,
-                                      // l10n!.networkError,
                                       textAlign: TextAlign.center,
                                       style: const TextStyle(fontSize: 24),
                                     ),
                                     _ => const Text(''),
                                   },
-
-                                  const SizedBox(
-                                    height: 50,
-                                  ),
-                                  TextButton(
-                                    child: const Text(
-                                      'Retry',
-                                    ), //TODO customise button
-                                    onPressed: () => ref
-                                        .read(homePageNotifierProvider.notifier)
-                                        .searchCity(searchController.text),
-                                  ),
                                 ],
                               ),
                             ),

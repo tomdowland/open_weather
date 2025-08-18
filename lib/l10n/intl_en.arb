@@ -14,5 +14,6 @@
   "locationPermissionsPermanentlyDenied": "Location permissions are permanently denied, we cannot request permissions. Please enable them manually in app settings.",
   "networkError": "Something went wrong, please check your connection and try again later.",
   "noResults": "Sorry, no results found for your search term.",
-  "timeout": "Sorry, your request timed out. Please check your connection and try again later."
+  "timeout": "Sorry, your request timed out. Please check your connection and try again later.",
+  "retry": "RETRY"
 }
