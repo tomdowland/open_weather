@@ -111,7 +111,6 @@ class HomePage extends HookConsumerWidget {
                               ),
                               _ => const Text(''),
                             },
-
                           ],
                         ),
                       ),
@@ -122,80 +121,108 @@ class HomePage extends HookConsumerWidget {
                           hasScrollBody: false,
                           child: weather.weatherResults == null
                               ? Center(
-                            child: Padding(
-                              padding: const EdgeInsets.all(16),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  switch (weather.errorType) {
-                                    RequestError.requestTimeout => Column(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(16),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
-                                        Text(
-                                          l10n!.timeout,
-                                          textAlign: TextAlign.center,
-                                          style: const TextStyle(fontSize: 24),
-                                        ),
-                                        const SizedBox(
-                                          height: 50,
-                                        ),
-                                        TextButton(
-                                          child: Text(
-                                            l10n.retry,
-                                          ), // TODOcustomise button
-                                          onPressed: () => ref
-                                              .read(homePageNotifierProvider.notifier)
-                                              .searchCity(searchController.text),
-                                        ),
+                                        switch (weather.errorType) {
+                                          RequestError.requestTimeout => Column(
+                                            children: [
+                                              Text(
+                                                l10n!.timeout,
+                                                textAlign: TextAlign.center,
+                                                style: const TextStyle(
+                                                  fontSize: 24,
+                                                ),
+                                              ),
+                                              const SizedBox(
+                                                height: 50,
+                                              ),
+                                              TextButton(
+                                                child: Text(
+                                                  l10n.retry,
+                                                ), // TODOcustomise button
+                                                onPressed: () => ref
+                                                    .read(
+                                                      homePageNotifierProvider
+                                                          .notifier,
+                                                    )
+                                                    .searchCity(
+                                                      searchController.text,
+                                                    ),
+                                              ),
+                                            ],
+                                          ),
+                                          RequestError
+                                              .locationPermissionsDenied =>
+                                            Text(
+                                              l10n!.locationPermissionsDenied,
+                                              textAlign: TextAlign.center,
+                                              style: const TextStyle(
+                                                fontSize: 24,
+                                              ),
+                                            ),
+                                          RequestError
+                                              .locationPermissionsPermanentlyDenied =>
+                                            Text(
+                                              l10n!
+                                                  .locationPermissionsPermanentlyDenied,
+                                              textAlign: TextAlign.center,
+                                              style: const TextStyle(
+                                                fontSize: 24,
+                                              ),
+                                            ),
+                                          RequestError
+                                              .locationServicesDisabled =>
+                                            Text(
+                                              l10n!.locationServicesDisabled,
+                                              textAlign: TextAlign.center,
+                                              style: const TextStyle(
+                                                fontSize: 24,
+                                              ),
+                                            ),
+                                          RequestError.networkError => Column(
+                                            children: [
+                                              Text(
+                                                l10n!.networkError,
+                                                textAlign: TextAlign.center,
+                                                style: const TextStyle(
+                                                  fontSize: 24,
+                                                ),
+                                              ),
+                                              const SizedBox(
+                                                height: 50,
+                                              ),
+                                              TextButton(
+                                                child: Text(
+                                                  l10n.retry,
+                                                ), // TODOcustomise button
+                                                onPressed: () => ref
+                                                    .read(
+                                                      homePageNotifierProvider
+                                                          .notifier,
+                                                    )
+                                                    .searchCity(
+                                                      searchController.text,
+                                                    ),
+                                              ),
+                                            ],
+                                          ),
+                                          RequestError.notFound => Text(
+                                            l10n!.noResults,
+                                            textAlign: TextAlign.center,
+                                            style: const TextStyle(
+                                              fontSize: 24,
+                                            ),
+                                          ),
+                                          _ => const Text(''),
+                                        },
                                       ],
                                     ),
-                                    RequestError.locationPermissionsDenied => Text(
-                                      l10n!.locationPermissionsDenied,
-                                      textAlign: TextAlign.center,
-                                      style: const TextStyle(fontSize: 24),
-                                    ),
-                                    RequestError
-                                        .locationPermissionsPermanentlyDenied =>
-                                        Text(
-                                          l10n!.locationPermissionsPermanentlyDenied,
-                                          textAlign: TextAlign.center,
-                                          style: const TextStyle(fontSize: 24),
-                                        ),
-                                    RequestError.locationServicesDisabled => Text(
-                                      l10n!.locationServicesDisabled,
-                                      textAlign: TextAlign.center,
-                                      style: const TextStyle(fontSize: 24),
-                                    ),
-                                    RequestError.networkError => Column(
-                                      children: [
-                                        Text(
-                                          l10n!.networkError,
-                                          textAlign: TextAlign.center,
-                                          style: const TextStyle(fontSize: 24),
-                                        ),
-                                        const SizedBox(
-                                          height: 50,
-                                        ),
-                                        TextButton(
-                                          child: Text(
-                                              l10n.retry,
-                                          ), // TODOcustomise button
-                                          onPressed: () => ref
-                                              .read(homePageNotifierProvider.notifier)
-                                              .searchCity(searchController.text),
-                                        ),
-                                      ],
-                                    ),
-                                    RequestError.notFound => Text(
-                                      l10n!.noResults,
-                                      textAlign: TextAlign.center,
-                                      style: const TextStyle(fontSize: 24),
-                                    ),
-                                    _ => const Text(''),
-                                  },
-                                ],
-                              ),
-                            ),
-                          )
+                                  ),
+                                )
                               : Column(
                                   children: [
                                     Text(

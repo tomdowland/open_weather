@@ -6,25 +6,52 @@ class WeatherRepository {
   WeatherRepository(this._apiService);
   final WeatherApiService _apiService;
 
+  // try-catches here don't seem to execute
   Future<ForecastData?> fetchWeatherForecast([String city = 'Tokyo']) {
-    return _apiService.fetchWeatherData(city);
+    try {
+      return _apiService.searchForecast(city);
+    } on Exception catch (e) {
+      print('forecast search error: $e');
+      rethrow;
+    }
   }
 
   Future<CurrentWeather?> getCurrentWeather(String city) {
-    return _apiService.fetchCurrentWeather(city);
+    try {
+      return _apiService.searchCurrentWeather(city);
+    } on Exception catch (e) {
+      print('current search error: $e');
+      rethrow;
+    }
   }
-
-  // Future<List<WeatherModel>?> getForecast(String city) {
-  //   return _apiService.fetchForecast(city);
-  // }
 
   Future<CurrentWeather?> getLocalWeather({
     required double latitude,
     required double longitude,
   }) {
-    return _apiService.getLocalWeather(
-      latitude: latitude,
-      longitude: longitude,
-    );
+    try {
+      return _apiService.getLocalWeather(
+        latitude: latitude,
+        longitude: longitude,
+      );
+    } on Exception catch (e) {
+      print('current gps error: $e');
+      rethrow;
+    }
+  }
+
+  Future<ForecastData?> getLocalForecast({
+    required double latitude,
+    required double longitude,
+  }) {
+    try {
+      return _apiService.getLocalForecast(
+        latitude: latitude,
+        longitude: longitude,
+      );
+    } on Exception catch (e) {
+      print('forecast gps error: $e');
+      rethrow;
+    }
   }
 }
