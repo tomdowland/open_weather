@@ -31,7 +31,12 @@ final GoRouter _router = GoRouter(
 Future<void> main() async {
   await dotenv.load();
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const ProviderScope(child: MyApp()));
+  runApp(
+    ProviderScope(
+      child: const MyApp(),
+      retry: (retryCount, error) => null,
+    ),
+  );
 }
 
 class MyApp extends ConsumerWidget {
