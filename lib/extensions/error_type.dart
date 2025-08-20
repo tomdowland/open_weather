@@ -18,8 +18,6 @@ extension RequestErrorExtensions on RequestError {
         return localisations.locationPermissionsPermanentlyDenied;
       case RequestError.requestTimeout:
         return localisations.timeout;
-      case RequestError.none:
-        return '';
     }
   }
 }
