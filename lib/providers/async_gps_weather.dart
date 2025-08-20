@@ -1,28 +1,29 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:open_weather/models/current_weather.dart';
+import 'package:open_weather/models/weather_result.dart';
 import 'package:open_weather/providers/location_provider.dart';
 import 'package:open_weather/repositories/weather_repository.dart';
 import 'package:open_weather/services/weather_api_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-part 'async_current_weather.g.dart';
+part 'async_gps_weather.g.dart';
 
 // Provider for the API Service (remains a regular Provider)
-final Provider<WeatherApiService> weatherApiService = Provider(
-  (ref) => WeatherApiService(),
-);
-
-// Provider for the Repository (remains a regular Provider)
-final Provider<WeatherRepository> weatherRepositoryProvider = Provider((ref) {
-  final apiService = ref.watch(weatherApiService);
-  return WeatherRepository(apiService);
-});
+// final Provider<WeatherApiService> weatherApiService = Provider(
+//   (ref) => WeatherApiService(),
+// );
+//
+// // Provider for the Repository (remains a regular Provider)
+// final Provider<WeatherRepository> weatherRepositoryProvider = Provider((ref) {
+//   final apiService = ref.watch(weatherApiService);
+//   return WeatherRepository(apiService);
+// });
 
 @riverpod
-class AsyncCurrentWeather extends _$AsyncCurrentWeather {
+class AsyncGeoLocationWeather extends _$AsyncGeoLocationWeather {
   @override
-  Future<CurrentWeather?> build() async {
+  Future<WeatherResult?> build() async {
     try {
-      final location = await ref.watch(locationCheckProvider.future);
+      final location = await ref.read(locationCheckProvider.future);
 
       if (location != null) {
         final result = await localCurrentWeather(
@@ -39,18 +40,18 @@ class AsyncCurrentWeather extends _$AsyncCurrentWeather {
     }
   }
 
-  Future<CurrentWeather?> searchCurrentWeather(String city) async {
-    try {
-      final result = await ref
-          .read(weatherRepositoryProvider)
-          .getCurrentWeather(city);
-      return result;
-    } catch (e) {
-      rethrow;
-    }
-  }
+  // Future<CurrentWeather?> searchCurrentWeather(String city) async {
+  //   try {
+  //     final result = await ref
+  //         .read(weatherRepositoryProvider)
+  //         .getCurrentWeather(city);
+  //     return result;
+  //   } catch (e) {
+  //     rethrow;
+  //   }
+  // }
 
-  Future<CurrentWeather?> localCurrentWeather(double lat, double lon) async {
+  Future<WeatherResult?> localCurrentWeather(double lat, double lon) async {
     try {
       final result = await ref
           .read(weatherRepositoryProvider)

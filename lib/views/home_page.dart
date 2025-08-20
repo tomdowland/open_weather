@@ -13,10 +13,12 @@ class HomePage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+
     final weather = ref.watch(homePageNotifierProvider);
     final l10n = AppLocalizations.of(context);
     final date = DateFormat('MM/dd HH:mm');
     final searchController = useTextEditingController();
+
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColor,
       appBar: AppBar(
@@ -126,7 +128,7 @@ class HomePage extends HookConsumerWidget {
                               Text(
                                 date.format(
                                   DateTime.fromMillisecondsSinceEpoch(
-                                    weather.currentWeather!.dt! * 1000,
+                                    (weather.currentWeather?.dt ?? 0) * 1000,
                                   ),
                                 ),
                                 style: const TextStyle(
@@ -199,7 +201,7 @@ class HomePage extends HookConsumerWidget {
                                           Text(
                                             date.format(
                                               DateTime.fromMillisecondsSinceEpoch(
-                                                item!.dt! * 1000,
+                                                (item?.dt ?? 0) * 1000,
                                               ),
                                             ),
                                             style: const TextStyle(
@@ -209,7 +211,7 @@ class HomePage extends HookConsumerWidget {
                                           ),
                                           Text(
                                             item
-                                                    .weather?[0]
+                                                    ?.weather?[0]
                                                     .description
                                                     ?.toTitleCase ??
                                                 '',
@@ -219,7 +221,7 @@ class HomePage extends HookConsumerWidget {
                                             textAlign: TextAlign.center,
                                           ),
                                           Text(
-                                            '${item.main?.temp?.toStringAsFixed(0)}°C',
+                                            '${item?.main?.temp?.toStringAsFixed(0)}°C',
                                             style: const TextStyle(
                                               fontSize: 16,
                                             ),

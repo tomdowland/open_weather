@@ -3,8 +3,8 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:open_weather/models/current_weather.dart';
 import 'package:open_weather/models/enum/error.dart';
 import 'package:open_weather/models/forecast_data.dart';
-import 'package:open_weather/providers/async_current_weather.dart';
-import 'package:open_weather/providers/async_five_day_forecast.dart';
+import 'package:open_weather/providers/async_gps_weather.dart';
+import 'package:open_weather/providers/async_weather_search.dart';
 import 'package:open_weather/providers/error_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'home_page_provider.freezed.dart';
@@ -28,18 +28,18 @@ class HomePageNotifier extends _$HomePageNotifier {
   @override
   FrontPage build() {
     try {
-      final asyncToday = ref.watch(asyncCurrentWeatherProvider);
-      final asyncForecast = ref.watch(asyncFiveDayForecastProvider);
-      print('from homepage provider forecast ${asyncForecast.error}');
-      print('from homepage provider today ${asyncToday.error}');
+      final asyncGeolocationWeather = ref.watch(asyncGeoLocationWeatherProvider);
+      // final asyncForecast = ref.watch(asyncFiveDayForecastProvider);
+      // print('from homepage provider forecast ${asyncForecast.error}');
+      // print('from homepage provider today ${asyncToday.error}');
       return FrontPage(
-        weatherResults: asyncForecast.value,
-        currentWeather: asyncToday.value,
-        isBusy: asyncForecast.isLoading || asyncToday.isLoading,
-        hasError: asyncForecast.hasError || asyncToday.hasError,
+        weatherResults: asyncGeolocationWeather.value?.forecastData,
+        currentWeather: asyncGeolocationWeather.value?.currentWeatherData,
+        isBusy: asyncGeolocationWeather.isLoading,
+        hasError: asyncGeolocationWeather.hasError,
         errorType: ref.watch(
           errorHandlerProvider(
-            (asyncForecast.error ?? Exception()) as Exception,
+            (asyncGeolocationWeather.error ?? Exception()) as Exception,
           ),
         ),
       );
@@ -57,16 +57,11 @@ class HomePageNotifier extends _$HomePageNotifier {
   Future<void> searchCity(String city) async {
     try {
       state = state.copyWith(isBusy: true, hasError: false);
-      final forecast = await ref
-          .read(asyncFiveDayForecastProvider.notifier)
-          .searchForecast(city);
-      final today = await ref
-          .read(asyncCurrentWeatherProvider.notifier)
-          .searchCurrentWeather(city);
+      final result = await ref.read(asyncWeatherSearchProvider(city).future);
       state = state.copyWith(
         editing: false,
-        weatherResults: forecast,
-        currentWeather: today,
+        weatherResults: result?.forecastData,
+        currentWeather: result?.currentWeatherData,
         // errorType: result?.errorType,
         isBusy: false,
         hasError: false,
