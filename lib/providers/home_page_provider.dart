@@ -5,6 +5,7 @@ import 'package:open_weather/models/enum/error.dart';
 import 'package:open_weather/models/forecast_data.dart';
 import 'package:open_weather/providers/async_current_weather.dart';
 import 'package:open_weather/providers/async_five_day_forecast.dart';
+import 'package:open_weather/providers/error_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'home_page_provider.freezed.dart';
 part 'home_page_provider.g.dart';
@@ -29,15 +30,21 @@ class HomePageNotifier extends _$HomePageNotifier {
     try {
       final asyncToday = ref.watch(asyncCurrentWeatherProvider);
       final asyncForecast = ref.watch(asyncFiveDayForecastProvider);
-        return FrontPage(
-          weatherResults: asyncForecast.value,
-          currentWeather: asyncToday.value,
-          isBusy: asyncForecast.isLoading || asyncToday.isLoading,
-          hasError: asyncForecast.hasError || asyncToday.hasError,
-          // errorType: asyncWeather.value?.errorType,
-          // errorMessage: asyncWeather.value?.errorMessage,
-        );
+      print('from homepage provider forecast ${asyncForecast.error}');
+      print('from homepage provider today ${asyncToday.error}');
+      return FrontPage(
+        weatherResults: asyncForecast.value,
+        currentWeather: asyncToday.value,
+        isBusy: asyncForecast.isLoading || asyncToday.isLoading,
+        hasError: asyncForecast.hasError || asyncToday.hasError,
+        errorType: ref.watch(
+          errorHandlerProvider(
+            (asyncForecast.error ?? Exception()) as Exception,
+          ),
+        ),
+      );
     } on Exception catch (e) {
+      print('homepage provider execeptio $e');
       return FrontPage(
         isBusy: false,
         hasError: true,
@@ -46,8 +53,6 @@ class HomePageNotifier extends _$HomePageNotifier {
       );
     }
   }
-
-
 
   Future<void> searchCity(String city) async {
     try {

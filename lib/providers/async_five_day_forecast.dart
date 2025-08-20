@@ -22,17 +22,18 @@ class AsyncFiveDayForecast extends _$AsyncFiveDayForecast {
   @override
   Future<ForecastData?> build() async {
     try {
-      final position = ref.watch(locationCheckProvider).value?.position;
-      if (position != null) {
+      final location = await ref.read(locationCheckProvider.future);
+
+      if (location != null) {
         final result = await localForecast(
-          position.latitude,
-          position.longitude,
+          location.position!.latitude,
+          location.position!.longitude,
         );
         return result;
       } else {
         return null;
       }
-    } on Exception catch (e) {
+    } on Exception {
       rethrow;
     }
   }
@@ -43,7 +44,7 @@ class AsyncFiveDayForecast extends _$AsyncFiveDayForecast {
           .read(weatherRepositoryProvider)
           .fetchWeatherForecast(city);
       return result;
-    } on Exception catch (e) {
+    } on Exception {
       rethrow;
     }
   }

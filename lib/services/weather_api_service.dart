@@ -7,11 +7,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class WeatherApiService {
   // try-catches here do fire
-  final Dio _dio = Dio(BaseOptions(
-    connectTimeout: const Duration(seconds: 10),
-    receiveTimeout: const Duration(seconds: 10),
-    sendTimeout: const Duration(seconds: 10),
-  ));
+  final Dio _dio = Dio(
+    BaseOptions(
+      connectTimeout: const Duration(seconds: 10),
+      receiveTimeout: const Duration(seconds: 10),
+      sendTimeout: const Duration(seconds: 10),
+    ),
+  );
   RestClient get client => RestClient(_dio, baseUrl: _url!);
   String? get _apiKey => dotenv.env['API_KEY'];
   String? get _url => dotenv.env['BASE_URL'];

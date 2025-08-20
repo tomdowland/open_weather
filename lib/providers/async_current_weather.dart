@@ -22,18 +22,19 @@ class AsyncCurrentWeather extends _$AsyncCurrentWeather {
   @override
   Future<CurrentWeather?> build() async {
     try {
+      final location = await ref.watch(locationCheckProvider.future);
 
-      final position = ref.watch(locationCheckProvider).value?.position;
-      if (position != null) {
+      if (location != null) {
         final result = await localCurrentWeather(
-          position.latitude,
-          position.longitude,
+          location.position!.latitude,
+          location.position!.longitude,
         );
         return result;
       } else {
         return null;
       }
     } catch (e) {
+      print('from async today provider: $e');
       rethrow;
     }
   }

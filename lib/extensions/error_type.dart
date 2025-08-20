@@ -1,14 +1,11 @@
-
-
 import 'package:flutter/cupertino.dart';
 import 'package:open_weather/l10n/app_localizations.dart';
 import 'package:open_weather/models/enum/error.dart';
 
 extension RequestErrorExtensions on RequestError {
-  String localisedMessage(BuildContext context){
+  String localisedMessage(BuildContext context) {
     final localisations = AppLocalizations.of(context)!;
-    switch(this){
-
+    switch (this) {
       case RequestError.notFound:
         return localisations.noResults;
       case RequestError.networkError:
