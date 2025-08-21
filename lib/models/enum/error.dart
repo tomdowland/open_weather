@@ -4,6 +4,5 @@ enum RequestError {
   locationServicesDisabled,
   locationPermissionsDenied,
   locationPermissionsPermanentlyDenied,
-  requestTimeout
-
+  requestTimeout,
 }

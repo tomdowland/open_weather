@@ -6,6 +6,8 @@ import 'package:intl/intl.dart';
 import 'package:open_weather/extensions/error_type.dart';
 import 'package:open_weather/extensions/string.dart';
 import 'package:open_weather/l10n/app_localizations.dart';
+import 'package:open_weather/providers/async_weather.dart';
+import 'package:open_weather/providers/error_provider.dart';
 import 'package:open_weather/providers/home_page_provider.dart';
 
 class HomePage extends HookConsumerWidget {
@@ -13,26 +15,29 @@ class HomePage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-
-    final weather = ref.watch(homePageNotifierProvider);
+    final pageState = ref.watch(homePageNotifierProvider);
     final l10n = AppLocalizations.of(context);
     final date = DateFormat('MM/dd HH:mm');
     final searchController = useTextEditingController();
-
+    final asyncWeather = ref.watch(asyncWeatherProvider);
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColor,
       appBar: AppBar(
-        title: weather.editing
+        title: pageState.editing
             ? TextField(
                 autofocus: true,
                 controller: searchController,
                 decoration: InputDecoration(hintText: l10n!.enterCityHint),
-                onSubmitted: ref
-                    .read(homePageNotifierProvider.notifier)
-                    .searchCity,
+                onSubmitted: (city) async {
+                  await ref
+                      .read(asyncWeatherProvider.notifier)
+                      .searchWeather(city);
+
+                  ref.read(homePageNotifierProvider.notifier).editCity();
+                },
               )
             : Text(
-                weather.weatherResults?.city?.name ??
+                asyncWeather.value?.currentWeatherData?.name ??
                     (searchController.text.isNotEmpty
                         ? searchController.text
                         : l10n!.weatherAppTitle),
@@ -40,7 +45,7 @@ class HomePage extends HookConsumerWidget {
               ),
         centerTitle: true,
         actions: [
-          if (weather.editing)
+          if (pageState.editing)
             const SizedBox()
           else
             IconButton(
@@ -55,7 +60,7 @@ class HomePage extends HookConsumerWidget {
               searchController.clear();
               ref.read(homePageNotifierProvider.notifier).editCity();
             },
-            icon: Icon(weather.editing ? Icons.cancel : Icons.search),
+            icon: Icon(pageState.editing ? Icons.cancel : Icons.search),
           ),
         ],
       ),
@@ -64,36 +69,47 @@ class HomePage extends HookConsumerWidget {
         child: Stack(
           children: [
             AnimatedOpacity(
-              opacity: weather.isBusy && !weather.hasError ? 1 : 0,
+              opacity: asyncWeather.isLoading && !asyncWeather.hasError ? 1 : 0,
               duration: const Duration(milliseconds: 100),
               child: const Center(child: CircularProgressIndicator()),
             ),
             AnimatedOpacity(
-              opacity: weather.isBusy && !weather.hasError ? 0 : 1,
+              opacity: asyncWeather.isLoading && !asyncWeather.hasError ? 0 : 1,
               duration: const Duration(milliseconds: 300),
-              child: weather.hasError
+              child: asyncWeather.hasError
                   ? Padding(
                       padding: const EdgeInsets.all(16),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            weather.errorType!.localisedMessage(context),
+                            ref
+                                    .watch(
+                                      errorHandlerProvider(
+                                        (asyncWeather.error ?? Exception())
+                                            as Exception,
+                                      ),
+                                    )
+                                    ?.localisedMessage(context) ??
+                                '',
                             textAlign: TextAlign.center,
                             style: const TextStyle(fontSize: 24),
                           ),
-                          TextButton(
-                            child: Text(
-                              l10n!.retry,
-                            ), // TODOcustomise button
-                            onPressed: () => ref
-                                .read(
-                                  homePageNotifierProvider.notifier,
-                                )
-                                .searchCity(
-                                  searchController.text,
-                                ),
-                          ),
+                          if (searchController.text.isNotEmpty)
+                            TextButton(
+                              child: Text(
+                                l10n!.retry,
+                              ), // TODOcustomise button
+                              onPressed: () async {
+                                await ref
+                                    .read(
+                                      asyncWeatherProvider.notifier,
+                                    )
+                                    .searchWeather(
+                                      searchController.text,
+                                    );
+                              },
+                            ),
                         ],
                       ),
                     )
@@ -120,15 +136,30 @@ class HomePage extends HookConsumerWidget {
                                 child: SizedBox(
                                   height: 150,
                                   width: 150,
-                                  child: Image.network(
-                                    'https://openweathermap.org/img/wn/${weather.currentWeather?.weather?[0].icon}@2x.png',
-                                  ),
+                                  child: asyncWeather.isLoading
+                                      ? const SizedBox()
+                                      : Image.network(
+                                          'https://openweathermap.org/img/wn/${asyncWeather.value?.currentWeatherData?.weather?[0].icon}@2x.png',
+                                          loadingBuilder: (_, child, chunk) {
+                                            if (chunk?.cumulativeBytesLoaded !=
+                                                chunk?.expectedTotalBytes) {
+                                              return const CircularProgressIndicator();
+                                            } else {
+                                              return child;
+                                            }
+                                          },
+                                        ),
                                 ),
                               ),
                               Text(
                                 date.format(
                                   DateTime.fromMillisecondsSinceEpoch(
-                                    (weather.currentWeather?.dt ?? 0) * 1000,
+                                    (asyncWeather
+                                                .value
+                                                ?.currentWeatherData
+                                                ?.dt ??
+                                            0) *
+                                        1000,
                                   ),
                                 ),
                                 style: const TextStyle(
@@ -137,8 +168,9 @@ class HomePage extends HookConsumerWidget {
                                 ),
                               ),
                               Text(
-                                weather
-                                        .currentWeather
+                                asyncWeather
+                                        .value
+                                        ?.currentWeatherData
                                         ?.weather?[0]
                                         .description
                                         ?.toTitleCase ??
@@ -149,7 +181,7 @@ class HomePage extends HookConsumerWidget {
                                 ),
                               ),
                               Text(
-                                '${weather.currentWeather?.main?.temp?.toStringAsFixed(0)}°C',
+                                '${asyncWeather.value?.currentWeatherData?.main?.temp?.toStringAsFixed(0)}°C',
                                 style: const TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.w500,
@@ -169,13 +201,15 @@ class HomePage extends HookConsumerWidget {
                                 height: 150,
                                 child: ListView.builder(
                                   scrollDirection: Axis.horizontal,
-                                  itemCount: weather
-                                      .weatherResults
+                                  itemCount: asyncWeather
+                                      .value
+                                      ?.forecastData
                                       ?.weatherList
                                       ?.length,
                                   itemBuilder: (_, __) {
-                                    final item = weather
-                                        .weatherResults
+                                    final item = asyncWeather
+                                        .value
+                                        ?.forecastData
                                         ?.weatherList?[__];
                                     return Container(
                                       decoration: BoxDecoration(
@@ -194,9 +228,11 @@ class HomePage extends HookConsumerWidget {
                                           SizedBox(
                                             height: 40,
                                             width: 40,
-                                            child: Image.network(
-                                              'https://openweathermap.org/img/wn/${item?.weather?[0].icon}@2x.png',
-                                            ),
+                                            child: asyncWeather.isLoading
+                                                ? const SizedBox()
+                                                : Image.network(
+                                                    'https://openweathermap.org/img/wn/${item?.weather?[0].icon}@2x.png',
+                                                  ),
                                           ),
                                           Text(
                                             date.format(

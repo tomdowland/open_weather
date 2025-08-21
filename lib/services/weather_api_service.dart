@@ -6,7 +6,6 @@ import 'package:open_weather/services/retrofit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class WeatherApiService {
-  // try-catches here do fire
   final Dio _dio = Dio(
     BaseOptions(
       connectTimeout: const Duration(seconds: 10),
@@ -31,7 +30,6 @@ class WeatherApiService {
       );
       return response;
     } catch (e) {
-      print('forecast search error: $e');
       rethrow;
     }
   }
@@ -48,7 +46,6 @@ class WeatherApiService {
       );
       return response;
     } catch (e) {
-      print('current search error: $e');
       rethrow;
     }
   }
@@ -69,7 +66,6 @@ class WeatherApiService {
       );
       return response;
     } catch (e) {
-      print('current gps error: $e');
       rethrow;
     }
   }
@@ -90,7 +86,6 @@ class WeatherApiService {
       );
       return response;
     } catch (e) {
-      print('forecast gps error: $e');
       rethrow;
     }
   }
