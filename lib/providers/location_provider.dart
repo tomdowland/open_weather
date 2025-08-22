@@ -32,7 +32,10 @@ class LocationCheck extends _$LocationCheck {
 
   Future<bool> checkLocationServicesEnabled() async {
     final enabled = await Geolocator.isLocationServiceEnabled();
-    return enabled;
+    if(enabled) {
+      return enabled;
+    }
+    throw const LocationServiceDisabledException();
   }
 
   Future<LocationPermission> checkAndRequestPermission() async {
@@ -50,12 +53,10 @@ class LocationCheck extends _$LocationCheck {
           timeLimit: Duration(seconds: 10),
         ),
       );
+
       return position;
     } on Exception {
-      //causes init loop for this provider if don't return null
-      //also refuses to show spinner after a split second
       rethrow;
-      // return null;
     }
   }
 }

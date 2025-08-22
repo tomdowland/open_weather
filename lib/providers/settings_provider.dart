@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:open_weather/providers/async_weather.dart';
 import 'package:open_weather/providers/shared_prefs_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -46,6 +47,6 @@ class SettingsNotifier extends _$SettingsNotifier {
   Future<void> setLocale(Locale newLocale) async {
     state = state.copyWith(locale: newLocale);
     await prefs?.setString('locale', state.locale?.languageCode ?? '');
-    // ref.invalidate(asyncWeatherProvider);
+    ref.invalidate(asyncWeatherProvider);
   }
 }

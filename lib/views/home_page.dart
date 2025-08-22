@@ -29,11 +29,11 @@ class HomePage extends HookConsumerWidget {
                 controller: searchController,
                 decoration: InputDecoration(hintText: l10n!.enterCityHint),
                 onSubmitted: (city) async {
+                  ref.read(homePageNotifierProvider.notifier).editCity();
                   await ref
                       .read(asyncWeatherProvider.notifier)
                       .searchWeather(city);
 
-                  ref.read(homePageNotifierProvider.notifier).editCity();
                 },
               )
             : Text(
@@ -69,12 +69,12 @@ class HomePage extends HookConsumerWidget {
         child: Stack(
           children: [
             AnimatedOpacity(
-              opacity: asyncWeather.isLoading && !asyncWeather.hasError ? 1 : 0,
+              opacity: asyncWeather.isLoading ? 1 : 0,
               duration: const Duration(milliseconds: 100),
               child: const Center(child: CircularProgressIndicator()),
             ),
             AnimatedOpacity(
-              opacity: asyncWeather.isLoading && !asyncWeather.hasError ? 0 : 1,
+              opacity: asyncWeather.isLoading ? 0 : 1,
               duration: const Duration(milliseconds: 300),
               child: asyncWeather.hasError
                   ? Padding(
@@ -95,21 +95,10 @@ class HomePage extends HookConsumerWidget {
                             textAlign: TextAlign.center,
                             style: const TextStyle(fontSize: 24),
                           ),
-                          if (searchController.text.isNotEmpty)
-                            TextButton(
-                              child: Text(
-                                l10n!.retry,
-                              ), // TODOcustomise button
-                              onPressed: () async {
-                                await ref
-                                    .read(
-                                      asyncWeatherProvider.notifier,
-                                    )
-                                    .searchWeather(
-                                      searchController.text,
-                                    );
-                              },
-                            ),
+                          TextButton(
+                            onPressed: () => ref.refresh(asyncWeatherProvider),
+                            child: Text(l10n!.retry),
+                          ),
                         ],
                       ),
                     )
@@ -268,6 +257,11 @@ class HomePage extends HookConsumerWidget {
                                     );
                                   },
                                 ),
+                              ),
+                              TextButton(
+                                onPressed: () =>
+                                    ref.refresh(asyncWeatherProvider),
+                                child: const Text('refresh'),
                               ),
                             ],
                           ),

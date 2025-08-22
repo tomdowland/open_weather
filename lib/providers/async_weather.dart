@@ -6,18 +6,35 @@ part 'async_weather.g.dart';
 
 @riverpod
 class AsyncWeather extends _$AsyncWeather {
+  String? searchedCity;
   @override
   Future<WeatherResult?> build() async {
     try {
-      final result = await locationWeather();
-      return result;
+      if (searchedCity != null) {
+        await searchWeather(searchedCity!);
+        return WeatherResult(
+          currentWeatherData: state.value?.currentWeatherData,
+          forecastData: state.value?.forecastData,
+        );
+      } else {
+        await locationWeather();
+        return WeatherResult(
+          currentWeatherData: state.value?.currentWeatherData,
+          forecastData: state.value?.forecastData,
+        );
+      }
     } catch (e) {
       rethrow;
     }
   }
 
-  Future<WeatherResult?> locationWeather() async {
+  Future<void> locationWeather() async {
+
+    state = const AsyncValue.loading();
     try {
+      if (state.isReloading) {
+        ref.invalidate(locationCheckProvider);
+      }
       final location = await ref.watch(locationCheckProvider.future);
       if (location != null) {
         final result = await ref
@@ -26,16 +43,17 @@ class AsyncWeather extends _$AsyncWeather {
               latitude: location.position!.latitude,
               longitude: location.position!.longitude,
             );
-        return result;
+        state = AsyncData(result);
       }
-      return null;
-    } catch (e) {
+    } catch (e, st) {
+      state = AsyncError(e, st);
       rethrow;
     }
   }
 
   Future<void> searchWeather(String city) async {
     try {
+      searchedCity = city;
       state = const AsyncValue.loading();
       final result = await ref
           .read(weatherRepositoryProvider)

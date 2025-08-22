@@ -14,13 +14,17 @@ class ErrorHandler extends _$ErrorHandler {
       case DioException():
         if (exception.response?.statusCode == 404) {
           return RequestError.notFound;
-        } else {
+        } if(exception.response?.statusCode == 400) {
           return RequestError.networkError;
+        }else{
+          return RequestError.requestTimeout;
         }
       case TimeoutException():
         return RequestError.requestTimeout;
       case LocationServiceDisabledException():
         return RequestError.locationServicesDisabled;
+      case PermissionDeniedException():
+        return RequestError.locationPermissionsDenied;
       case _:
         return null;
     }
