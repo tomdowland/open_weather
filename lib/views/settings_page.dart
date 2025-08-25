@@ -9,7 +9,6 @@ class SettingsPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(settingsNotifierProvider);
-    // final weather = ref.watch(homePageNotifierProvider);
     final l10n = AppLocalizations.of(context);
 
     return Scaffold(
@@ -63,11 +62,6 @@ class SettingsPage extends ConsumerWidget {
                               await ref
                                   .read(settingsNotifierProvider.notifier)
                                   .setLocale(newLocale);
-                              // await ref
-                              //     .read(homePageNotifierProvider.notifier)
-                              //     .searchCity(
-                              //       weather.weatherResults?.city?.name ?? '',
-                              //     );
                             }
                           },
                           items: const <DropdownMenuItem<Locale>>[
