@@ -1,17 +1,13 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:open_weather/models/enum/error.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'location_provider.g.dart';
-
 
 @riverpod
 class LocationCheck extends _$LocationCheck {
   @override
   Future<Position?> build() async {
     try {
-      return  await getLocation();
-
+      return await getLocation();
     } catch (e) {
       rethrow;
     }
@@ -24,7 +20,7 @@ class LocationCheck extends _$LocationCheck {
         return enabled;
       }
       throw const LocationServiceDisabledException();
-    } catch(e) {
+    } catch (e) {
       rethrow;
     }
   }
