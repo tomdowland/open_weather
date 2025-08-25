@@ -3,51 +3,50 @@ import 'package:geolocator/geolocator.dart';
 import 'package:open_weather/models/enum/error.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'location_provider.g.dart';
-part 'location_provider.freezed.dart';
 
-@freezed
-abstract class GeoLocationModel with _$GeoLocationModel {
-  const factory GeoLocationModel({
-    bool? locationServicesEnabled,
-    Position? position,
-    LocationPermission? permissionStatus,
-    RequestError? error,
-  }) = _GeoLocationModel;
-}
 
 @riverpod
 class LocationCheck extends _$LocationCheck {
   @override
-  Future<GeoLocationModel?> build() async {
+  Future<Position?> build() async {
     try {
-      return GeoLocationModel(
-        permissionStatus: await checkAndRequestPermission(),
-        locationServicesEnabled: await checkLocationServicesEnabled(),
-        position: await getLocation(),
-      );
+      return  await getLocation();
+
     } catch (e) {
       rethrow;
     }
   }
 
   Future<bool> checkLocationServicesEnabled() async {
-    final enabled = await Geolocator.isLocationServiceEnabled();
-    if (enabled) {
-      return enabled;
+    try {
+      final enabled = await Geolocator.isLocationServiceEnabled();
+      if (enabled) {
+        return enabled;
+      }
+      throw const LocationServiceDisabledException();
+    } catch(e) {
+      rethrow;
     }
-    throw const LocationServiceDisabledException();
   }
 
-  Future<LocationPermission> checkAndRequestPermission() async {
-    var permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
+  Future<LocationPermission?> checkAndRequestPermission() async {
+    try {
+      if (await checkLocationServicesEnabled()) {
+        var permission = await Geolocator.checkPermission();
+        if (permission == LocationPermission.denied) {
+          permission = await Geolocator.requestPermission();
+        }
+        return permission;
+      }
+      return null;
+    } catch (e) {
+      rethrow;
     }
-    return permission;
   }
 
   Future<Position?> getLocation() async {
     try {
+      await checkAndRequestPermission();
       final position = await Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(
           timeLimit: Duration(seconds: 10),

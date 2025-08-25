@@ -39,8 +39,8 @@ class AsyncWeather extends _$AsyncWeather {
         final result = await ref
             .read(weatherServiceProvider)
             .getLocalWeather(
-              latitude: location.position!.latitude,
-              longitude: location.position!.longitude,
+              latitude: location.latitude,
+              longitude: location.longitude,
             );
         state = AsyncData(result);
       }
