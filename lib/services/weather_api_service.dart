@@ -87,6 +87,8 @@ class WeatherApiService {
 }
 
 @riverpod
-WeatherApiService weatherApiService (Ref ref) {
-  return WeatherApiService(ref.read(settingsNotifierProvider).locale!.languageCode);
+WeatherApiService weatherApiService(Ref ref) {
+  return WeatherApiService(
+    ref.read(settingsNotifierProvider).locale!.languageCode,
+  );
 }

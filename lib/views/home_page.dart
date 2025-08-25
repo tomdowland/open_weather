@@ -33,7 +33,6 @@ class HomePage extends HookConsumerWidget {
                   await ref
                       .read(asyncWeatherProvider.notifier)
                       .searchWeather(city);
-
                 },
               )
             : Text(

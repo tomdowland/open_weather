@@ -29,7 +29,6 @@ class AsyncWeather extends _$AsyncWeather {
   }
 
   Future<void> locationWeather() async {
-
     state = const AsyncValue.loading();
     try {
       if (state.isReloading) {

@@ -32,7 +32,7 @@ class LocationCheck extends _$LocationCheck {
 
   Future<bool> checkLocationServicesEnabled() async {
     final enabled = await Geolocator.isLocationServiceEnabled();
-    if(enabled) {
+    if (enabled) {
       return enabled;
     }
     throw const LocationServiceDisabledException();
