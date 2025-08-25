@@ -1,30 +1,49 @@
-import 'package:open_weather/models/current_weather.dart';
-import 'package:open_weather/models/forecast_data.dart';
+import 'package:open_weather/models/weather_result.dart';
 import 'package:open_weather/services/weather_api_service.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+part 'weather_repository.g.dart';
 
 class WeatherRepository {
   WeatherRepository(this._apiService);
   final WeatherApiService _apiService;
 
-  Future<ForecastData?> fetchWeatherForecast([String city = 'Tokyo']) {
-    return _apiService.fetchWeatherData(city);
+  Future<WeatherResult> searchWeather(String city) async {
+    try {
+      final forecast = await _apiService.searchForecast(city);
+      final current = await _apiService.searchCurrentWeather(city);
+      return WeatherResult(
+        forecastData: forecast,
+        currentWeatherData: current,
+      );
+    } on Exception {
+      rethrow;
+    }
   }
 
-  Future<CurrentWeather?> getCurrentWeather(String city) {
-    return _apiService.fetchCurrentWeather(city);
+  Future<WeatherResult?> getLocalWeather({
+    required double? latitude,
+    required double? longitude,
+  }) async {
+    try {
+      final current = await _apiService.getLocalWeather(
+        latitude: latitude,
+        longitude: longitude,
+      );
+      final forecast = await _apiService.getLocalForecast(
+        latitude: latitude,
+        longitude: longitude,
+      );
+      return WeatherResult(
+        currentWeatherData: current,
+        forecastData: forecast,
+      );
+    } on Exception {
+      rethrow;
+    }
   }
+}
 
-  // Future<List<WeatherModel>?> getForecast(String city) {
-  //   return _apiService.fetchForecast(city);
-  // }
-
-  Future<CurrentWeather?> getLocalWeather({
-    required double latitude,
-    required double longitude,
-  }) {
-    return _apiService.getLocalWeather(
-      latitude: latitude,
-      longitude: longitude,
-    );
-  }
+@riverpod
+WeatherRepository weatherRepository(Ref ref) {
+  return WeatherRepository(ref.read(weatherApiServiceProvider));
 }

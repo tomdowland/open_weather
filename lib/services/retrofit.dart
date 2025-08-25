@@ -15,6 +15,8 @@ abstract class RestClient {
     @Query('units') required String units,
     @Query('lang') required String language,
     @Query('q') String? city,
+    @Query('lat') double? lat,
+    @Query('lon') double? lon,
   });
 
   @GET('/weather')

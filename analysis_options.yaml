@@ -12,6 +12,7 @@ analyzer:
     - "**/color/**"
     - "**/gen/**"
     - "**/cmd/**"
+    - "**/generated/"
 
 linter:
   rules:

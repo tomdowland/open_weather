@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:open_weather/l10n/app_localizations.dart';
-import 'package:open_weather/providers/home_page_provider.dart';
 import 'package:open_weather/providers/settings_provider.dart';
 
 class SettingsPage extends ConsumerWidget {
@@ -10,7 +9,7 @@ class SettingsPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(settingsNotifierProvider);
-    final weather = ref.watch(homePageNotifierProvider);
+    // final weather = ref.watch(homePageNotifierProvider);
     final l10n = AppLocalizations.of(context);
 
     return Scaffold(
@@ -64,11 +63,11 @@ class SettingsPage extends ConsumerWidget {
                               await ref
                                   .read(settingsNotifierProvider.notifier)
                                   .setLocale(newLocale);
-                              await ref
-                                  .read(homePageNotifierProvider.notifier)
-                                  .searchCity(
-                                    weather.weatherResults?.city?.name ?? '',
-                                  );
+                              // await ref
+                              //     .read(homePageNotifierProvider.notifier)
+                              //     .searchCity(
+                              //       weather.weatherResults?.city?.name ?? '',
+                              //     );
                             }
                           },
                           items: const <DropdownMenuItem<Locale>>[
