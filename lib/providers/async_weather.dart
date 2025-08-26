@@ -9,56 +9,45 @@ class AsyncWeather extends _$AsyncWeather {
   String? searchedCity;
   @override
   Future<WeatherResult?> build() async {
-    try {
-      if (searchedCity != null) {
-        await searchWeather(searchedCity!);
-        return WeatherResult(
-          currentWeatherData: state.value?.currentWeatherData,
-          forecastData: state.value?.forecastData,
-        );
-      } else {
-        await locationWeather();
-        return WeatherResult(
-          currentWeatherData: state.value?.currentWeatherData,
-          forecastData: state.value?.forecastData,
-        );
-      }
-    } catch (e) {
-      rethrow;
+    if (searchedCity != null) {
+      await searchWeather(searchedCity!);
+      return state.value;
+    } else {
+      await locationWeather();
+      return state.value;
     }
   }
 
   Future<void> locationWeather() async {
     state = const AsyncValue.loading();
-    try {
-      if (state.isReloading) {
-        ref.invalidate(locationCheckProvider);
-      }
-      final location = await ref.watch(locationCheckProvider.future);
-      if (location != null) {
+    if (state.isReloading) {
+      ref.invalidate(locationCheckProvider);
+    }
+    final location = await AsyncValue.guard(() async {
+      final result = await ref.watch(locationCheckProvider.future);
+      return result;
+    });
+    if (location.value != null) {
+      state = await AsyncValue.guard(() async {
         final result = await ref
             .read(weatherServiceProvider)
             .getLocalWeather(
-              latitude: location.latitude,
-              longitude: location.longitude,
+              latitude: location.value?.latitude,
+              longitude: location.value?.longitude,
             );
-        state = AsyncData(result);
-      }
-    } catch (e, st) {
-      state = AsyncError(e, st);
-      rethrow;
+        return result;
+      });
+    } else {
+      throw location.error! as Exception;
     }
   }
 
   Future<void> searchWeather(String city) async {
-    try {
-      searchedCity = city;
-      state = const AsyncValue.loading();
+    searchedCity = city;
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
       final result = await ref.read(weatherServiceProvider).searchWeather(city);
-      state = AsyncData(result);
-    } on Exception catch (e, st) {
-      state = AsyncValue.error(e, st);
-      rethrow;
-    }
+      return result;
+    });
   }
 }

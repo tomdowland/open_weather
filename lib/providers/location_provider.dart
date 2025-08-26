@@ -6,52 +6,49 @@ part 'location_provider.g.dart';
 class LocationCheck extends _$LocationCheck {
   @override
   Future<Position?> build() async {
-    try {
-      return await getLocation();
-    } catch (e) {
-      rethrow;
-    }
+    final result = await getLocation();
+    return result;
   }
 
   Future<bool> checkLocationServicesEnabled() async {
-    try {
-      final enabled = await Geolocator.isLocationServiceEnabled();
-      if (enabled) {
-        return enabled;
-      }
-      throw const LocationServiceDisabledException();
-    } catch (e) {
-      rethrow;
+    final enabled = await AsyncValue.guard(() async {
+      final result = await Geolocator.isLocationServiceEnabled();
+      return result;
+    });
+    if (enabled.value!) {
+      return enabled.value!;
     }
+    throw const LocationServiceDisabledException();
   }
 
   Future<LocationPermission?> checkAndRequestPermission() async {
-    try {
-      if (await checkLocationServicesEnabled()) {
-        var permission = await Geolocator.checkPermission();
-        if (permission == LocationPermission.denied) {
-          permission = await Geolocator.requestPermission();
-        }
-        return permission;
+    if (await checkLocationServicesEnabled()) {
+      var permission = await AsyncValue.guard(() async {
+        final result = await Geolocator.checkPermission();
+        return result;
+      });
+      if (permission.value == LocationPermission.denied) {
+        permission = await AsyncValue.guard(() async {
+          final result = await Geolocator.requestPermission();
+          return result;
+        });
       }
-      return null;
-    } catch (e) {
-      rethrow;
+      return permission.value;
     }
+    return null;
   }
 
   Future<Position?> getLocation() async {
-    try {
-      await checkAndRequestPermission();
-      final position = await Geolocator.getCurrentPosition(
+    await checkAndRequestPermission();
+    final position = await AsyncValue.guard(() async {
+      final result = await Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(
           timeLimit: Duration(seconds: 10),
         ),
       );
+      return result;
+    });
 
-      return position;
-    } on Exception {
-      rethrow;
-    }
+    return position.value;
   }
 }
