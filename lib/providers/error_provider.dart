@@ -9,17 +9,13 @@ part 'error_provider.g.dart';
 @riverpod
 class ErrorHandler extends _$ErrorHandler {
   @override
-  RequestError? build(Exception? exception) {
+  RequestError? build(Object? exception) {
     switch (exception) {
       case DioException():
         if (exception.response?.statusCode == 404) {
           return RequestError.notFound;
         }
-        if (exception.response?.statusCode == 400) {
-          return RequestError.networkError;
-        } else {
-          return RequestError.requestTimeout;
-        }
+        return RequestError.networkError;
       case TimeoutException():
         return RequestError.requestTimeout;
       case LocationServiceDisabledException():
@@ -27,7 +23,7 @@ class ErrorHandler extends _$ErrorHandler {
       case PermissionDeniedException():
         return RequestError.locationPermissionsDenied;
       case _:
-        return null;
+        return RequestError.networkError;
     }
   }
 }
