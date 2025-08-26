@@ -2,7 +2,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:open_weather/models/current_weather.dart';
 import 'package:open_weather/models/forecast_data.dart';
 import 'package:open_weather/providers/client_provider.dart';
-import 'package:open_weather/providers/settings_provider.dart';
+import 'package:open_weather/providers/locale_provider.dart';
 import 'package:open_weather/services/retrofit.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'weather_repository.g.dart';
@@ -82,7 +82,7 @@ class WeatherRepository {
 @riverpod
 WeatherRepository weatherRepository(Ref ref) {
   return WeatherRepository(
-    ref.read(settingsNotifierProvider).locale!.languageCode,
+    ref.read(localeSettingProvider).locale.languageCode,
     ref.read(restClientProvider),
   );
 }
