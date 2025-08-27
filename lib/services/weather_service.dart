@@ -20,9 +20,9 @@ class WeatherService {
     }
   }
 
-  Future<WeatherResult?> getLocalWeather({
-    required double? latitude,
-    required double? longitude,
+  Future<WeatherResult> getLocalWeather({
+    required double latitude,
+    required double longitude,
   }) async {
     try {
       final current = await _repoService.getLocalWeather(
