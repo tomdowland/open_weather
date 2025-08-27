@@ -11,44 +11,31 @@ class LocationCheck extends _$LocationCheck {
   }
 
   Future<bool> checkLocationServicesEnabled() async {
-    final enabled = await AsyncValue.guard(() async {
-      final result = await Geolocator.isLocationServiceEnabled();
-      return result;
-    });
-    if (enabled.value!) {
-      return enabled.value!;
+    final enabled = await Geolocator.isLocationServiceEnabled();
+    if (enabled) {
+      return enabled;
     }
     throw const LocationServiceDisabledException();
   }
 
   Future<LocationPermission?> checkAndRequestPermission() async {
     if (await checkLocationServicesEnabled()) {
-      var permission = await AsyncValue.guard(() async {
-        final result = await Geolocator.checkPermission();
-        return result;
-      });
-      if (permission.value == LocationPermission.denied) {
-        permission = await AsyncValue.guard(() async {
-          final result = await Geolocator.requestPermission();
-          return result;
-        });
+      var permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
       }
-      return permission.value;
+      return permission;
     }
     return null;
   }
 
   Future<Position?> getLocation() async {
     await checkAndRequestPermission();
-    final position = await AsyncValue.guard(() async {
-      final result = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(
-          timeLimit: Duration(seconds: 10),
-        ),
-      );
-      return result;
-    });
-
-    return position.value;
+    final position = await Geolocator.getCurrentPosition(
+      locationSettings: const LocationSettings(
+        timeLimit: Duration(seconds: 10),
+      ),
+    );
+    return position;
   }
 }
