@@ -1,5 +1,3 @@
-
-
 import 'dart:ui';
 
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -12,19 +10,17 @@ part 'locale_provider.g.dart';
 
 @freezed
 abstract class LocaleModel with _$LocaleModel {
-  const factory LocaleModel ({
+  const factory LocaleModel({
     required Locale locale,
-}) = _LocaleModel;
+  }) = _LocaleModel;
 }
 
 @riverpod
 class LocaleSetting extends _$LocaleSetting {
-
   @override
   LocaleModel build() {
     return LocaleModel(locale: _getLocale());
   }
-
 
   SharedPreferences? get prefs => ref.watch(sharedPrefsProvider).value;
 
@@ -35,7 +31,7 @@ class LocaleSetting extends _$LocaleSetting {
 
   Future<void> setLocale(Locale newLocale) async {
     state = state.copyWith(locale: newLocale);
-    await prefs?.setString('locale', state.locale?.languageCode ?? '');
+    await prefs?.setString('locale', state.locale.languageCode);
     ref.invalidate(asyncWeatherProvider);
   }
 }

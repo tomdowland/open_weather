@@ -9,18 +9,15 @@ part 'theme_provider.g.dart';
 abstract class ThemeModel with _$ThemeModel {
   const factory ThemeModel({
     required bool darkMode,
-}) = _ThemeModel;
+  }) = _ThemeModel;
 }
 
-
 @riverpod
-class ThemeSetting extends _$ThemeSetting{
-
+class ThemeSetting extends _$ThemeSetting {
   @override
   ThemeModel build() {
     return ThemeModel(darkMode: _getDarkModeSetting());
   }
-
 
   SharedPreferences? get prefs => ref.watch(sharedPrefsProvider).value;
 
@@ -32,5 +29,4 @@ class ThemeSetting extends _$ThemeSetting{
     state = state.copyWith(darkMode: !state.darkMode);
     await prefs?.setBool('dark_mode', state.darkMode);
   }
-
 }
