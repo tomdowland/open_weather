@@ -7,8 +7,8 @@ import 'package:open_weather/l10n/app_localizations.dart';
 import 'package:open_weather/meta/theme.dart';
 import 'package:open_weather/providers/locale_provider.dart';
 import 'package:open_weather/providers/theme_provider.dart';
-import 'package:open_weather/views/home_page.dart';
-import 'package:open_weather/views/settings_page.dart';
+import 'package:open_weather/ui/pages/home_page.dart';
+import 'package:open_weather/ui/pages/settings_page.dart';
 
 final GoRouter _router = GoRouter(
   routes: <RouteBase>[
