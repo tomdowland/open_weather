@@ -15,6 +15,9 @@ class ErrorHandler extends _$ErrorHandler {
         if (exception.response?.statusCode == 404) {
           return RequestError.notFound;
         }
+        if (exception.type == DioExceptionType.connectionTimeout) {
+          return RequestError.requestTimeout;
+        }
         return RequestError.networkError;
       case TimeoutException():
         return RequestError.requestTimeout;
