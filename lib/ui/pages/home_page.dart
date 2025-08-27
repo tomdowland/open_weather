@@ -113,18 +113,16 @@ class HomePage extends HookConsumerWidget {
             );
           },
           error: (error, stackTrace) {
+            final errorHandler = ref.watch(
+              errorHandlerProvider(error),
+            );
             return Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    ref
-                            .watch(
-                              errorHandlerProvider(error),
-                            )
-                            ?.localisedMessage(context) ??
-                        '',
+                    errorHandler?.localisedMessage(context) ?? '',
                     textAlign: TextAlign.center,
                     style: const TextStyle(fontSize: 24),
                   ),
