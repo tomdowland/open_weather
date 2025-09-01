@@ -49,12 +49,15 @@ void main() {
           response: Response(
             requestOptions: RequestOptions(),
             statusCode: 401,
-            statusMessage: 'Client error - the request contains bad syntax or cannot be fulfilled',
-            data: 'Client error - the request contains bad syntax or cannot be fulfilled',
+            statusMessage:
+                'Client error - the request contains bad syntax or cannot be fulfilled',
+            data:
+                'Client error - the request contains bad syntax or cannot be fulfilled',
           ),
         ),
       );
-      expect( () async => restClient.weatherSearch(
+      expect(
+        () async => restClient.weatherSearch(
           apiKey: 'apiKey',
           units: 'units',
           language: 'language',
