@@ -55,7 +55,7 @@ class HomePage extends HookConsumerWidget {
               icon: const Icon(Icons.settings),
             ),
           IconButton(
-            onPressed: () {
+            onPressed: asyncWeather.isLoading?null:() {
               searchController.clear();
               ref.read(homePageNotifierProvider.notifier).editCity();
             },
@@ -63,9 +63,9 @@ class HomePage extends HookConsumerWidget {
           ),
         ],
         leading: IconButton(
-          onPressed: ref
-              .read(asyncWeatherProvider.notifier)
-              .getNewLocationWeather,
+          onPressed: asyncWeather.isLoading
+              ? null
+              : ref.read(asyncWeatherProvider.notifier).getNewLocationWeather,
           icon: const Icon(Icons.gps_fixed),
         ),
       ),

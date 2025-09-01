@@ -21,11 +21,11 @@ class AsyncWeather extends _$AsyncWeather {
     if (state.isReloading) {
       ref.invalidate(locationCheckProvider);
     }
-    final location = await ref.watch(locationCheckProvider.future);
+    final location = await ref.read(locationCheckProvider).getLocation();
     final result = await ref
         .read(weatherServiceProvider)
         .getLocalWeather(
-          latitude: location!.latitude,
+          latitude: location.latitude,
           longitude: location.longitude,
         );
     return result;
@@ -41,12 +41,12 @@ class AsyncWeather extends _$AsyncWeather {
 
   Future<void> getNewLocationWeather() async {
     state = const AsyncValue.loading();
-    final location = await ref.refresh(locationCheckProvider.future);
     state = await AsyncValue.guard(() async {
+      final location = await ref.read(locationCheckProvider).getLocation();
       final result = await ref
           .read(weatherServiceProvider)
           .getLocalWeather(
-            latitude: location!.latitude,
+            latitude: location.latitude,
             longitude: location.longitude,
           );
       return result;

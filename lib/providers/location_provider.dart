@@ -2,13 +2,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'location_provider.g.dart';
 
-@riverpod
-class LocationCheck extends _$LocationCheck {
-  @override
-  Future<Position?> build() async {
-    final result = await getLocation();
-    return result;
-  }
+class LocationCheck{
 
   Future<bool> checkLocationServicesEnabled() async {
     final enabled = await Geolocator.isLocationServiceEnabled();
@@ -29,7 +23,7 @@ class LocationCheck extends _$LocationCheck {
     return null;
   }
 
-  Future<Position?> getLocation() async {
+  Future<Position> getLocation() async {
     await checkAndRequestPermission();
     final position = await Geolocator.getCurrentPosition(
       locationSettings: const LocationSettings(
@@ -38,4 +32,9 @@ class LocationCheck extends _$LocationCheck {
     );
     return position;
   }
+}
+
+@riverpod
+LocationCheck locationCheck (Ref ref) {
+  return LocationCheck();
 }
