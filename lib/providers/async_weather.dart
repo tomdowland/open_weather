@@ -1,6 +1,6 @@
 import 'package:open_weather/models/weather_result.dart';
 import 'package:open_weather/providers/location_provider.dart';
-import 'package:open_weather/repositories/weather_repository.dart';
+import 'package:open_weather/services/weather_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'async_weather.g.dart';
 
@@ -9,58 +9,57 @@ class AsyncWeather extends _$AsyncWeather {
   String? searchedCity;
   @override
   Future<WeatherResult?> build() async {
-    try {
-      if (searchedCity != null) {
-        await searchWeather(searchedCity!);
-        return WeatherResult(
-          currentWeatherData: state.value?.currentWeatherData,
-          forecastData: state.value?.forecastData,
-        );
-      } else {
-        await locationWeather();
-        return WeatherResult(
-          currentWeatherData: state.value?.currentWeatherData,
-          forecastData: state.value?.forecastData,
-        );
-      }
-    } catch (e) {
-      rethrow;
+    if (searchedCity != null) {
+      return searchWeather();
+    } else {
+      return locationWeather();
     }
   }
 
-  Future<void> locationWeather() async {
+  Future<WeatherResult?> locationWeather() async {
     state = const AsyncValue.loading();
-    try {
-      if (state.isReloading) {
-        ref.invalidate(locationCheckProvider);
-      }
-      final location = await ref.watch(locationCheckProvider.future);
-      if (location != null) {
-        final result = await ref
-            .read(weatherRepositoryProvider)
-            .getLocalWeather(
-              latitude: location.position!.latitude,
-              longitude: location.position!.longitude,
-            );
-        state = AsyncData(result);
-      }
-    } catch (e, st) {
-      state = AsyncError(e, st);
-      rethrow;
+    if (state.isReloading) {
+      ref.invalidate(locationCheckProvider);
     }
+    final location = await ref.read(locationCheckProvider).getLocation();
+    final result = await ref
+        .read(weatherServiceProvider)
+        .getLocalWeather(
+          latitude: location.latitude,
+          longitude: location.longitude,
+        );
+    return result;
   }
 
-  Future<void> searchWeather(String city) async {
-    try {
-      searchedCity = city;
-      state = const AsyncValue.loading();
+  Future<WeatherResult?> searchWeather() async {
+    state = const AsyncValue.loading();
+    final result = await ref
+        .read(weatherServiceProvider)
+        .searchWeather(searchedCity!);
+    return result;
+  }
+
+  Future<void> getNewLocationWeather() async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      final location = await ref.read(locationCheckProvider).getLocation();
       final result = await ref
-          .read(weatherRepositoryProvider)
-          .searchWeather(city);
-      state = AsyncData(result);
-    } on Exception catch (e, st) {
-      state = AsyncValue.error(e, st);
-      rethrow;
-    }
+          .read(weatherServiceProvider)
+          .getLocalWeather(
+            latitude: location.latitude,
+            longitude: location.longitude,
+          );
+      return result;
+    });
+    searchedCity = null;
+  }
+
+  Future<void> updateWeather(String city) async {
+    state = const AsyncValue.loading();
+    searchedCity = city;
+    state = await AsyncValue.guard(() async {
+      final result = await ref.read(weatherServiceProvider).searchWeather(city);
+      return result;
+    });
   }
 }

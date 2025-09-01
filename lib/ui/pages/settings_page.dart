@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:open_weather/l10n/app_localizations.dart';
-import 'package:open_weather/providers/settings_provider.dart';
+import 'package:open_weather/providers/locale_provider.dart';
+import 'package:open_weather/providers/theme_provider.dart';
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final settings = ref.watch(settingsNotifierProvider);
-    // final weather = ref.watch(homePageNotifierProvider);
+    final locale = ref.watch(localeSettingProvider);
+    final themeMode = ref.watch(themeSettingProvider);
     final l10n = AppLocalizations.of(context);
 
     return Scaffold(
@@ -28,10 +29,10 @@ class SettingsPage extends ConsumerWidget {
                       Text(l10n.darkMode, style: const TextStyle(fontSize: 24)),
                       const Spacer(),
                       Switch(
-                        value: settings.darkMode,
+                        value: themeMode.darkMode,
                         onChanged: (_) {
                           ref
-                              .read(settingsNotifierProvider.notifier)
+                              .read(themeSettingProvider.notifier)
                               .toggleDarkMode();
                         },
                       ),
@@ -48,7 +49,7 @@ class SettingsPage extends ConsumerWidget {
                       const Spacer(),
                       Expanded(
                         child: DropdownButtonFormField<Locale>(
-                          value: settings.locale,
+                          value: locale.locale,
                           isDense: false,
                           decoration: const InputDecoration.collapsed(
                             hintText: '',
@@ -59,15 +60,10 @@ class SettingsPage extends ConsumerWidget {
                           ),
                           onChanged: (Locale? newLocale) async {
                             if (newLocale != null &&
-                                newLocale != settings.locale) {
+                                newLocale != locale.locale) {
                               await ref
-                                  .read(settingsNotifierProvider.notifier)
+                                  .read(localeSettingProvider.notifier)
                                   .setLocale(newLocale);
-                              // await ref
-                              //     .read(homePageNotifierProvider.notifier)
-                              //     .searchCity(
-                              //       weather.weatherResults?.city?.name ?? '',
-                              //     );
                             }
                           },
                           items: const <DropdownMenuItem<Locale>>[

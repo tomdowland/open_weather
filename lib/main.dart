@@ -5,9 +5,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:open_weather/l10n/app_localizations.dart';
 import 'package:open_weather/meta/theme.dart';
-import 'package:open_weather/providers/settings_provider.dart';
-import 'package:open_weather/views/home_page.dart';
-import 'package:open_weather/views/settings_page.dart';
+import 'package:open_weather/providers/locale_provider.dart';
+import 'package:open_weather/providers/theme_provider.dart';
+import 'package:open_weather/ui/pages/home_page.dart';
+import 'package:open_weather/ui/pages/settings_page.dart';
 
 final GoRouter _router = GoRouter(
   routes: <RouteBase>[
@@ -45,13 +46,14 @@ class MyApp extends ConsumerWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final settings = ref.watch(settingsNotifierProvider);
+    final locale = ref.watch(localeSettingProvider);
+    final themeMode = ref.watch(themeSettingProvider);
     return MaterialApp.router(
       routerConfig: _router,
       theme: lightTheme,
       darkTheme: darkTheme,
-      locale: settings.locale,
-      themeMode: settings.darkMode ? ThemeMode.dark : ThemeMode.light,
+      locale: locale.locale,
+      themeMode: themeMode.darkMode ? ThemeMode.dark : ThemeMode.light,
       supportedLocales: const [Locale('en'), Locale('ja')],
       localizationsDelegates: const [
         AppLocalizations.delegate,
