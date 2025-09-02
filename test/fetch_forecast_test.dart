@@ -15,7 +15,6 @@ void main() {
 
       when(
         restClient.weatherSearch(
-          apiKey: 'apiKey',
           units: 'units',
           language: 'language',
           city: 'city',
@@ -23,7 +22,6 @@ void main() {
       ).thenAnswer((_) async => Future<ForecastData>.value(MockForecastData()));
       expect(
         await restClient.weatherSearch(
-          apiKey: 'apiKey',
           units: 'units',
           language: 'language',
           city: 'city',
@@ -37,7 +35,6 @@ void main() {
 
       when(
         restClient.weatherSearch(
-          apiKey: 'apiKey',
           units: 'units',
           language: 'language',
           city: ' ',
@@ -58,7 +55,6 @@ void main() {
       );
       expect(
         () async => restClient.weatherSearch(
-          apiKey: 'apiKey',
           units: 'units',
           language: 'language',
           city: ' ',

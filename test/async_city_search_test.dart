@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
@@ -31,7 +30,7 @@ void main() async {
       final container = createContainer();
       final notifier = container.read(asyncWeatherProvider.notifier);
       when(
-        container.read(weatherServiceProvider).searchWeather('city'),
+        container.read(weatherServiceProvider).searchWeather(city: 'city'),
       ).thenAnswer(
         (_) async => Future<WeatherResult>.value(MockWeatherResult()),
       );
@@ -48,7 +47,7 @@ void main() async {
       final container = createContainer();
       final notifier = container.read(asyncWeatherProvider.notifier);
       when(
-        container.read(weatherServiceProvider).searchWeather('city'),
+        container.read(weatherServiceProvider).searchWeather(city: 'city'),
       ).thenThrow(
         DioException.badResponse(
           statusCode: 404,

@@ -15,7 +15,6 @@ void main() {
 
       when(
         restClient.currentWeatherSearch(
-          apiKey: 'apiKey',
           units: 'units',
           language: 'language',
           city: 'city',
@@ -25,7 +24,6 @@ void main() {
       );
       expect(
         await restClient.currentWeatherSearch(
-          apiKey: 'apiKey',
           units: 'units',
           language: 'language',
           city: 'city',
@@ -39,7 +37,6 @@ void main() {
 
       when(
         restClient.currentWeatherSearch(
-          apiKey: 'apiKey',
           units: 'units',
           language: 'language',
           city: ' ',
@@ -60,7 +57,6 @@ void main() {
       );
       expect(
         () async => restClient.currentWeatherSearch(
-          apiKey: 'apiKey',
           units: 'units',
           language: 'language',
           city: ' ',
