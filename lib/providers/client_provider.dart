@@ -12,6 +12,9 @@ RestClient restClient(Ref ref) {
       connectTimeout: const Duration(seconds: 10),
       receiveTimeout: const Duration(seconds: 10),
       sendTimeout: const Duration(seconds: 10),
+      queryParameters: {
+        'appid': dotenv.env['API_KEY'],
+      },
     ),
   );
 

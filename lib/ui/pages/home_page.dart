@@ -55,24 +55,26 @@ class HomePage extends HookConsumerWidget {
               icon: const Icon(Icons.settings),
             ),
           IconButton(
-            onPressed: asyncWeather.isLoading?null:() {
-              searchController.clear();
-              ref.read(homePageNotifierProvider.notifier).editCity();
-            },
+            onPressed: asyncWeather.isLoading
+                ? null
+                : () {
+                    searchController.clear();
+                    ref.read(homePageNotifierProvider.notifier).editCity();
+                  },
             icon: Icon(pageState.editing ? Icons.cancel : Icons.search),
           ),
         ],
         leading: IconButton(
           onPressed: asyncWeather.isLoading
               ? null
-              : ()async {
-            if(pageState.editing) {
+              : () async {
+                  if (pageState.editing) {
                     ref.read(homePageNotifierProvider.notifier).editCity();
                   }
                   await ref
-                .read(asyncWeatherProvider.notifier)
-                .getNewLocationWeather();
-          },
+                      .read(asyncWeatherProvider.notifier)
+                      .getNewLocationWeather();
+                },
           icon: const Icon(Icons.gps_fixed),
         ),
       ),

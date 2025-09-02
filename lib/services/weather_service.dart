@@ -7,10 +7,10 @@ class WeatherService {
   WeatherService(this._repoService);
   final WeatherRepository _repoService;
 
-  Future<WeatherResult> searchWeather(String city) async {
+  Future<WeatherResult> searchWeather({required String city}) async {
     try {
-      final forecast = await _repoService.searchForecast(city);
-      final current = await _repoService.searchCurrentWeather(city);
+      final current = await _repoService.getLocalWeather(city: city);
+      final forecast = await _repoService.getLocalForecast(city: city);
       return WeatherResult(
         forecastData: forecast,
         currentWeatherData: current,

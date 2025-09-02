@@ -1,4 +1,3 @@
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:open_weather/models/current_weather.dart';
 import 'package:open_weather/models/forecast_data.dart';
 import 'package:open_weather/providers/client_provider.dart';
@@ -12,45 +11,16 @@ class WeatherRepository {
   final String locale;
   final RestClient client;
 
-  String? get _apiKey => dotenv.env['API_KEY'];
-
-  Future<ForecastData?> searchForecast(String city) async {
-    try {
-      final response = await client.weatherSearch(
-        city: city,
-        apiKey: _apiKey!,
-        units: 'metric',
-        language: locale,
-      );
-      return response;
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  Future<CurrentWeather?> searchCurrentWeather(String city) async {
-    try {
-      final response = await client.currentWeatherSearch(
-        city: city,
-        apiKey: _apiKey!,
-        units: 'metric',
-        language: locale,
-      );
-      return response;
-    } catch (e) {
-      rethrow;
-    }
-  }
-
   Future<CurrentWeather?> getLocalWeather({
     double? latitude,
     double? longitude,
+    String? city,
   }) async {
     try {
       final response = await client.currentWeatherSearch(
         lat: latitude,
         lon: longitude,
-        apiKey: _apiKey!,
+        city: city,
         units: 'metric',
         language: locale,
       );
@@ -63,12 +33,13 @@ class WeatherRepository {
   Future<ForecastData?> getLocalForecast({
     double? latitude,
     double? longitude,
+    String? city,
   }) async {
     try {
       final response = await client.weatherSearch(
         lat: latitude,
         lon: longitude,
-        apiKey: _apiKey!,
+        city: city,
         units: 'metric',
         language: locale,
       );

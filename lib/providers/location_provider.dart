@@ -2,8 +2,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'location_provider.g.dart';
 
-class LocationCheck{
-
+class LocationCheck {
   Future<bool> checkLocationServicesEnabled() async {
     final enabled = await Geolocator.isLocationServiceEnabled();
     if (enabled) {
@@ -35,6 +34,6 @@ class LocationCheck{
 }
 
 @riverpod
-LocationCheck locationCheck (Ref ref) {
+LocationCheck locationCheck(Ref ref) {
   return LocationCheck();
 }

@@ -11,7 +11,7 @@ abstract class RestClient {
 
   @GET('/forecast')
   Future<ForecastData> weatherSearch({
-    @Query('appid') required String apiKey,
+    // @Query('appid') required String apiKey,
     @Query('units') required String units,
     @Query('lang') required String language,
     @Query('q') String? city,
@@ -21,7 +21,7 @@ abstract class RestClient {
 
   @GET('/weather')
   Future<CurrentWeather> currentWeatherSearch({
-    @Query('appid') required String apiKey,
+    // @Query('appid') required String apiKey,
     @Query('units') required String units,
     @Query('lang') required String language,
     @Query('q') String? city,

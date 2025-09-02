@@ -31,24 +31,18 @@ class AsyncWeather extends _$AsyncWeather {
     return result;
   }
 
-  Future<WeatherResult?> searchWeather() async {
+  Future<WeatherResult?> searchWeather({String? city}) async {
     state = const AsyncValue.loading();
     final result = await ref
         .read(weatherServiceProvider)
-        .searchWeather(searchedCity!);
+        .searchWeather(city: city ?? searchedCity!);
     return result;
   }
 
   Future<void> getNewLocationWeather() async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      final location = await ref.read(locationCheckProvider).getLocation();
-      final result = await ref
-          .read(weatherServiceProvider)
-          .getLocalWeather(
-            latitude: location.latitude,
-            longitude: location.longitude,
-          );
+      final result = locationWeather();
       return result;
     });
     searchedCity = null;
@@ -58,7 +52,7 @@ class AsyncWeather extends _$AsyncWeather {
     state = const AsyncValue.loading();
     searchedCity = city;
     state = await AsyncValue.guard(() async {
-      final result = await ref.read(weatherServiceProvider).searchWeather(city);
+      final result = await searchWeather(city: city);
       return result;
     });
   }
