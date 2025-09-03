@@ -1,4 +1,4 @@
-
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -18,7 +18,7 @@ import 'repository_test.mocks.dart';
   MockSpec<CurrentWeather>(),
   MockSpec<ForecastData>(),
   MockSpec<RestClient>(),
-  MockSpec<Locale>()
+  MockSpec<Locale>(),
 ])
 void main() async {
   ProviderContainer createContainer() {
@@ -35,24 +35,41 @@ void main() async {
     return container;
   }
 
-
   group('run tests on weather repo', () {
-    test('test1', () async {
+    test('get current weather successfully', () async {
       final container = createContainer();
 
       when(
-        container.read(restClientProvider).currentWeatherSearch(
-          units: 'metric',
-          language: MockLocale().languageCode,
-        ),
+        container
+            .read(restClientProvider)
+            .currentWeatherSearch(
+              units: 'metric',
+              language: MockLocale().languageCode,
+            ),
       ).thenAnswer(
-          (_) => Future<CurrentWeather>.value(MockCurrentWeather()),
+        (_) => Future<CurrentWeather>.value(MockCurrentWeather()),
       );
-
 
       await expectLater(
         container.read(weatherRepositoryProvider).getLocalWeather(),
         completion(isA<MockCurrentWeather>()),
+      );
+    });
+
+    test('throw timeout exception', () async {
+      final container = createContainer();
+      when(
+        container
+            .read(restClientProvider)
+            .currentWeatherSearch(
+              units: 'metric',
+              language: MockLocale().languageCode,
+            ),
+      ).thenThrow(TimeoutException('message'));
+
+      await expectLater(
+        container.read(weatherRepositoryProvider).getLocalWeather(),
+        throwsA(isA<TimeoutException>()),
       );
     });
   });
