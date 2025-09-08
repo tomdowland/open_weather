@@ -99,5 +99,31 @@ void main() async {
         throwsException,
       );
     });
+
+    test('update location', () async{
+      final container = createContainer();
+      final notifier = container.read(asyncWeatherProvider.notifier);
+
+      when(container.read(locationCheckProvider).getLocation()).thenAnswer(
+            (_) async => Future<Position>.value(MockPosition()),
+      );
+
+      when(
+        container
+            .read(weatherServiceProvider)
+            .getLocalWeather(
+          latitude: MockPosition().longitude,
+          longitude: MockPosition().latitude,
+        ),
+      ).thenAnswer(
+            (_) async => Future<WeatherResult>.value(MockWeatherResult()),
+      );
+       await notifier.getNewLocationWeather();
+
+       expect(
+        container.read(asyncWeatherProvider).value,
+        isA<MockWeatherResult>(),
+      );
+    });
   });
 }
