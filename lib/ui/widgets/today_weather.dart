@@ -24,6 +24,7 @@ class TodayWeather extends StatelessWidget {
             child: Image.network(
               'https://openweathermap.org/img/wn/${weatherData.weather?[0].icon}@2x.png',
               fit: BoxFit.fill,
+              errorBuilder: (context, exception, stackTrace) => const SizedBox(),
             ),
           ),
         ),

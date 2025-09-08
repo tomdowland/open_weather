@@ -12,7 +12,7 @@ class ForecastList extends StatelessWidget {
     return Column(
       children: [
         SizedBox(
-          height: 150,
+          height: 176,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             itemCount: forecastData.weatherList?.length,
@@ -28,15 +28,16 @@ class ForecastList extends StatelessWidget {
                   ),
                 ),
                 margin: const EdgeInsets.all(8),
-                height: 160,
                 width: 120,
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     SizedBox(
-                      height: 40,
-                      width: 40,
+                      height: 45,
+                      width: 45,
                       child: Image.network(
                         'https://openweathermap.org/img/wn/${item?.weather?[0].icon}@2x.png',
+                        errorBuilder: (context, exception, stackTrace) => const SizedBox(),
                       ),
                     ),
                     Text(
