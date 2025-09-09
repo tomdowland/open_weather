@@ -11,7 +11,7 @@ import 'package:open_weather/providers/async_weather.dart';
 import 'package:open_weather/providers/location_provider.dart';
 import 'package:open_weather/services/weather_service.dart';
 
-import 'async_fetch_forecast_test.mocks.dart';
+import 'async_weather_gps_test.mocks.dart';
 
 @GenerateNiceMocks([
   MockSpec<LocationCheck>(),
@@ -68,7 +68,7 @@ void main() async {
 
       await expectLater(
         container.read(asyncWeatherProvider.future),
-        throwsException,
+        throwsA(isA<TimeoutException>()),
       );
     });
 
@@ -88,15 +88,21 @@ void main() async {
               longitude: MockPosition().latitude,
             ),
       ).thenThrow(
-        DioException.connectionTimeout(
-          timeout: Duration.zero,
+        DioException(
           requestOptions: RequestOptions(),
+          type: DioExceptionType.connectionTimeout,
         ),
       );
 
       await expectLater(
         container.read(asyncWeatherProvider.future),
-        throwsException,
+        throwsA(
+          isA<DioException>().having(
+            (e) => e.type,
+            'type',
+            DioExceptionType.connectionTimeout,
+          ),
+        ),
       );
     });
 
@@ -120,9 +126,9 @@ void main() async {
       );
       await notifier.getNewLocationWeather();
 
-      expect(
-        container.read(asyncWeatherProvider).value,
-        isA<MockWeatherResult>(),
+      await expectLater(
+        container.read(asyncWeatherProvider.future),
+        completion(isA<MockWeatherResult>()),
       );
     });
   });

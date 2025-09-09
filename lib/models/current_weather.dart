@@ -1,3 +1,4 @@
+import 'package:faker/faker.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'current_weather.freezed.dart';
@@ -23,6 +24,25 @@ abstract class CurrentWeather with _$CurrentWeather {
 
   factory CurrentWeather.fromJson(Map<String, Object?> json) =>
       _$CurrentWeatherFromJson(json);
+
+  factory CurrentWeather.dummy() {
+    return CurrentWeather(
+      coord: Coord(lat: faker.geo.latitude(), lon: faker.geo.longitude()),
+      cod: 200,
+      main: Main(
+        temp: faker.randomGenerator.decimal(scale: 100, min: -100),
+      ),
+      timezone: DateTime.now().millisecondsSinceEpoch,
+      name: faker.address.city(),
+      dt: DateTime.now().millisecondsSinceEpoch,
+      weather: [
+        Weather(
+          main: faker.animal.name(),
+          description: faker.animal.name(),
+        ),
+      ],
+    );
+  }
 }
 
 @freezed

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:ui';
 
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
@@ -55,13 +56,13 @@ void main() async {
       final result = await container
           .read(weatherServiceProvider)
           .getLocalWeather(
-        latitude: 0,
-        longitude: 0,
-      );
+            latitude: 0,
+            longitude: 0,
+          );
 
-        expect(
-         result.forecastData,
-       isA<MockForecastData>(),
+      expect(
+        result.forecastData,
+        isA<MockForecastData>(),
       );
     });
 
@@ -88,6 +89,49 @@ void main() async {
               longitude: 0,
             ),
         throwsA(isA<TimeoutException>()),
+      );
+    });
+
+    test('search city successfully', () async {
+      final container = createContainer();
+
+      when(
+        container.read(weatherRepositoryProvider).getLocalForecast(city: ''),
+      ).thenAnswer((_) => Future<ForecastData>.value(MockForecastData()));
+
+      final result = await container
+          .read(weatherServiceProvider)
+          .searchWeather(city: '');
+
+      expect(
+        result.forecastData,
+        isA<MockForecastData>(),
+      );
+    });
+
+    test('search city not found', () async {
+      final container = createContainer();
+
+      when(
+        container.read(weatherRepositoryProvider).getLocalForecast(city: ''),
+      ).thenThrow(
+        DioException(
+          requestOptions: RequestOptions(),
+          type: DioExceptionType.badResponse,
+          response: Response(requestOptions: RequestOptions(), statusCode: 404),
+        ),
+      );
+
+      expect(
+        () async =>
+            container.read(weatherServiceProvider).searchWeather(city: ''),
+        throwsA(
+          isA<DioException>().having(
+            (e) => e.response?.statusCode,
+            '',
+            404,
+          ),
+        ),
       );
     });
   });

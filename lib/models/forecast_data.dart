@@ -1,3 +1,4 @@
+import 'package:faker/faker.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'forecast_data.freezed.dart';
@@ -15,6 +16,31 @@ abstract class ForecastData with _$ForecastData {
 
   factory ForecastData.fromJson(Map<String, dynamic> json) =>
       _$ForecastDataFromJson(json);
+
+  factory ForecastData.dummy() {
+    return ForecastData(
+      city: City(
+        name: faker.address.city(),
+        timezone: DateTime.now().millisecondsSinceEpoch,
+      ),
+      weatherList: [
+        ...List.generate(40, (length) {
+          return WeatherList(
+            dt: DateTime.now().millisecondsSinceEpoch,
+            main: Main(
+              temp: faker.randomGenerator.decimal(scale: 100, min: -100),
+            ),
+            weather: [
+              Weather(
+                main: faker.animal.name(),
+                description: faker.animal.name(),
+              ),
+            ],
+          );
+        }),
+      ],
+    );
+  }
 }
 
 @freezed

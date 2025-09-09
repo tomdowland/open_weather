@@ -72,5 +72,42 @@ void main() async {
         throwsA(isA<TimeoutException>()),
       );
     });
+
+    test('get forecast weather successfully', () async {
+      final container = createContainer();
+
+      when(
+        container
+            .read(restClientProvider)
+            .weatherSearch(
+              units: 'metric',
+              language: MockLocale().languageCode,
+            ),
+      ).thenAnswer(
+        (_) => Future<ForecastData>.value(MockForecastData()),
+      );
+
+      await expectLater(
+        container.read(weatherRepositoryProvider).getLocalForecast(),
+        completion(isA<MockForecastData>()),
+      );
+    });
+
+    test('throw forecast timeout exception', () async {
+      final container = createContainer();
+      when(
+        container
+            .read(restClientProvider)
+            .weatherSearch(
+              units: 'metric',
+              language: MockLocale().languageCode,
+            ),
+      ).thenThrow(TimeoutException('message'));
+
+      await expectLater(
+        container.read(weatherRepositoryProvider).getLocalForecast(),
+        throwsA(isA<TimeoutException>()),
+      );
+    });
   });
 }

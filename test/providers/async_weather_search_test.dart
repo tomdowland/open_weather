@@ -6,7 +6,7 @@ import 'package:mockito/mockito.dart';
 import 'package:open_weather/models/weather_result.dart';
 import 'package:open_weather/providers/async_weather.dart';
 import 'package:open_weather/services/weather_service.dart';
-import 'async_city_search_test.mocks.dart';
+import 'async_weather_search_test.mocks.dart';
 
 @GenerateNiceMocks([
   MockSpec<WeatherService>(),
@@ -49,10 +49,9 @@ void main() async {
       when(
         container.read(weatherServiceProvider).searchWeather(city: 'city'),
       ).thenThrow(
-        DioException.badResponse(
-          statusCode: 404,
+        DioException(
           requestOptions: RequestOptions(),
-          response: Response(requestOptions: RequestOptions()),
+          type: DioExceptionType.badResponse,
         ),
       );
 
@@ -60,7 +59,11 @@ void main() async {
 
       await expectLater(
         container.read(asyncWeatherProvider).error,
-        isA<DioException>(),
+        isA<DioException>().having(
+          (e) => e.type,
+          '',
+          DioExceptionType.badResponse,
+        ),
       );
     });
   });
