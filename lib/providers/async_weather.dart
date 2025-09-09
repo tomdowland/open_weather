@@ -42,7 +42,7 @@ class AsyncWeather extends _$AsyncWeather {
   Future<void> getNewLocationWeather() async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      final result = locationWeather();
+      final result = await locationWeather();
       return result;
     });
     searchedCity = null;
