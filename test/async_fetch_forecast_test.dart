@@ -100,27 +100,27 @@ void main() async {
       );
     });
 
-    test('update location', () async{
+    test('update location', () async {
       final container = createContainer();
       final notifier = container.read(asyncWeatherProvider.notifier);
 
       when(container.read(locationCheckProvider).getLocation()).thenAnswer(
-            (_) async => Future<Position>.value(MockPosition()),
+        (_) async => Future<Position>.value(MockPosition()),
       );
 
       when(
         container
             .read(weatherServiceProvider)
             .getLocalWeather(
-          latitude: MockPosition().longitude,
-          longitude: MockPosition().latitude,
-        ),
+              latitude: MockPosition().longitude,
+              longitude: MockPosition().latitude,
+            ),
       ).thenAnswer(
-            (_) async => Future<WeatherResult>.value(MockWeatherResult()),
+        (_) async => Future<WeatherResult>.value(MockWeatherResult()),
       );
-       await notifier.getNewLocationWeather();
+      await notifier.getNewLocationWeather();
 
-       expect(
+      expect(
         container.read(asyncWeatherProvider).value,
         isA<MockWeatherResult>(),
       );
