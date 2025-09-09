@@ -3,13 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:mockito/annotations.dart';
-import 'package:mockito/mockito.dart';
 import 'package:open_weather/providers/location_provider.dart';
-import 'location_provider_test.mocks.dart';
 
 @GenerateNiceMocks([MockSpec<Position>()])
 void main() {
-
   TestWidgetsFlutterBinding.ensureInitialized();
 
   ProviderContainer createContainer() {
@@ -28,7 +25,7 @@ void main() {
       //return denied
       return 0;
     }
-    if(call.method == 'requestPermission'){
+    if (call.method == 'requestPermission') {
       //return allowed
       return 2;
     }
