@@ -37,7 +37,8 @@ class ForecastList extends StatelessWidget {
                       width: 45,
                       child: Image.network(
                         'https://openweathermap.org/img/wn/${item?.weather?[0].icon}@2x.png',
-                        errorBuilder: (context, exception, stackTrace) => const SizedBox(),
+                        errorBuilder: (context, exception, stackTrace) =>
+                            const SizedBox(),
                       ),
                     ),
                     Text(
