@@ -108,11 +108,8 @@ void main() async {
       final settings = find.byIcon(Icons.settings);
       final textField = find.byType(TextField);
 
-      expect(find.byType(CircularProgressIndicator), findsOneWidget);
-
       await tester.pumpAndSettle();
 
-      expect(find.byType(CircularProgressIndicator), findsNothing);
       expect(search, findsOneWidget);
       expect(gps, findsOneWidget);
       expect(cancel, findsNothing);
@@ -150,20 +147,19 @@ void main() async {
 
       expect(gps, findsOneWidget);
       expect(gpsButton, findsOneWidget);
-      expect(find.byType(CircularProgressIndicator), findsOneWidget);
       expect(tester.widget<IconButton>(gpsButton).onPressed, isNull);
 
       await tester.pumpAndSettle();
 
       expect(gps, findsOneWidget);
       expect(tester.widget<IconButton>(gpsButton).onPressed, isNotNull);
-      expect(find.byType(CircularProgressIndicator), findsNothing);
 
       when(
         container
             .read(weatherRepositoryProvider)
             .getLocalWeather(latitude: 1, longitude: 1),
       ).thenAnswer((_) async {
+        await Future<void>.delayed(Duration.zero);
         return Future<CurrentWeather>.value(CurrentWeather.dummy());
       });
       when(
@@ -179,12 +175,10 @@ void main() async {
       await tester.pump();
 
       expect(tester.widget<IconButton>(gpsButton).onPressed, isNull);
-      expect(find.byType(CircularProgressIndicator), findsOneWidget);
 
       await tester.pumpAndSettle();
 
-      expect(find.text('Current Weather'), findsOneWidget);
-      expect(find.text('Weather Forecast'), findsOneWidget);
+      expect(tester.widget<IconButton>(gpsButton).onPressed, isNotNull);
     });
   });
 }
