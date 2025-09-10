@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -14,6 +17,8 @@ import 'package:open_weather/providers/async_weather.dart';
 import 'package:open_weather/repositories/weather_repository.dart';
 import 'package:open_weather/services/retrofit.dart';
 import 'package:open_weather/ui/pages/home_page.dart';
+import 'package:open_weather/ui/widgets/forecast_list.dart';
+import 'package:open_weather/ui/widgets/today_weather.dart';
 import 'home_page_test.mocks.dart';
 
 @GenerateNiceMocks([
@@ -179,6 +184,192 @@ void main() async {
       await tester.pumpAndSettle();
 
       expect(tester.widget<IconButton>(gpsButton).onPressed, isNotNull);
+    });
+  });
+
+  group('page tests', () {
+    testWidgets('description', (tester) async {
+      await tester.pumpWidget(createTestContainer());
+      final container = tester.container();
+
+      // final forecastListWidget = find.descendant(of: find.byType(ForecastList), matching: find.byType(List));
+
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      expect(find.text('Current Weather'), findsNothing);
+      expect(find.text('Weather Forecast'), findsNothing);
+
+      await tester.pumpAndSettle();
+
+      expect(find.byType(CircularProgressIndicator), findsNothing);
+      expect(find.text('Current Weather'), findsOneWidget);
+      expect(find.text('Weather Forecast'), findsOneWidget);
+      expect(find.byType(TodayWeather), findsOneWidget);
+      expect(find.byType(ForecastList), findsOneWidget);
+      expect(
+        tester
+            .widget<ForecastList>(find.byType(ForecastList))
+            .forecastData
+            .weatherList
+            ?.length,
+        40,
+      );
+    });
+  });
+
+  group('exceptions', () {
+    testWidgets('fail and show timeout error', (tester) async {
+      await tester.pumpWidget(createTestContainer());
+
+      final container = tester.container();
+
+      await tester.pumpAndSettle();
+
+      when(
+        container
+            .read(weatherRepositoryProvider)
+            .getLocalForecast(latitude: 1, longitude: 1),
+      ).thenThrow(
+        DioException(
+          requestOptions: RequestOptions(),
+          type: DioExceptionType.connectionTimeout,
+        ),
+      );
+
+      await tester.tap(find.byIcon(Icons.gps_fixed));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.textContaining('Sorry, your request timed out.'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('fail and show not found', (tester) async {
+      await tester.pumpWidget(createTestContainer());
+
+      final container = tester.container();
+
+      await tester.pumpAndSettle();
+
+      when(
+        container
+            .read(weatherRepositoryProvider)
+            .getLocalForecast(latitude: 1, longitude: 1),
+      ).thenThrow(
+        DioException(
+          requestOptions: RequestOptions(),
+          type: DioExceptionType.badResponse,
+          response: Response(
+            requestOptions: RequestOptions(),
+            statusCode: 404,
+          ),
+        ),
+      );
+
+      await tester.tap(find.byIcon(Icons.gps_fixed));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.textContaining('Sorry, no results found'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('location time out', (tester) async {
+      await tester.pumpWidget(createTestContainer());
+
+      final container = tester.container();
+
+      await tester.pumpAndSettle();
+
+      when(
+        container
+            .read(weatherRepositoryProvider)
+            .getLocalForecast(longitude: 1, latitude: 1),
+      ).thenThrow(TimeoutException(''));
+
+      await tester.tap(find.byIcon(Icons.gps_fixed));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.textContaining('Sorry, your request timed out.'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('something went wrong', (tester) async {
+      await tester.pumpWidget(createTestContainer());
+
+      final container = tester.container();
+
+      await tester.pumpAndSettle();
+
+      when(
+        container
+            .read(weatherRepositoryProvider)
+            .getLocalForecast(longitude: 1, latitude: 1),
+      ).thenThrow(
+        DioException(
+          requestOptions: RequestOptions(),
+          type: DioExceptionType.badResponse,
+          response: Response(
+            requestOptions: RequestOptions(),
+            statusCode: 400,
+          ),
+        ),
+      );
+
+      await tester.tap(find.byIcon(Icons.gps_fixed));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.textContaining('Something went wrong'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('location service disabled', (tester) async {
+      await tester.pumpWidget(createTestContainer());
+
+      final container = tester.container();
+
+      await tester.pumpAndSettle();
+
+      when(
+        container
+            .read(weatherRepositoryProvider)
+            .getLocalForecast(longitude: 1, latitude: 1),
+      ).thenThrow(const LocationServiceDisabledException());
+
+      await tester.tap(find.byIcon(Icons.gps_fixed));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.textContaining('Location services are disabled'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('location permission denied', (tester) async {
+      await tester.pumpWidget(createTestContainer());
+
+      final container = tester.container();
+
+      await tester.pumpAndSettle();
+
+      when(
+        container
+            .read(weatherRepositoryProvider)
+            .getLocalForecast(longitude: 1, latitude: 1),
+      ).thenThrow(const PermissionDeniedException(''));
+
+      await tester.tap(find.byIcon(Icons.gps_fixed));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.textContaining('Location permissions are denied'),
+        findsOneWidget,
+      );
     });
   });
 }
