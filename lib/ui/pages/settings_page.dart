@@ -66,19 +66,19 @@ class SettingsPage extends ConsumerWidget {
                                   .setLocale(newLocale);
                             }
                           },
-                          items: const <DropdownMenuItem<Locale>>[
+                          items: <DropdownMenuItem<Locale>>[
                             DropdownMenuItem(
-                              value: Locale('en'),
+                              value: const Locale('en'),
                               child: Text(
-                                'English',
-                                style: TextStyle(fontSize: 20),
+                                l10n.english,
+                                style: const TextStyle(fontSize: 20),
                               ),
                             ),
                             DropdownMenuItem(
-                              value: Locale('ja'),
+                              value: const Locale('ja'),
                               child: Text(
-                                '日本語',
-                                style: TextStyle(fontSize: 20),
+                                l10n.japanese,
+                                style: const TextStyle(fontSize: 20),
                               ),
                             ),
                           ],
