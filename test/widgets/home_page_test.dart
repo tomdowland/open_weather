@@ -159,6 +159,11 @@ void main() async {
       expect(gps, findsOneWidget);
       expect(tester.widget<IconButton>(gpsButton).onPressed, isNotNull);
 
+      await tester.tap(find.byIcon(Icons.search));
+      await tester.pump();
+
+      expect(find.byType(TextField), findsOneWidget);
+
       when(
         container
             .read(weatherRepositoryProvider)
@@ -179,6 +184,7 @@ void main() async {
       await tester.tap(gpsButton);
       await tester.pump();
 
+      expect(find.byType(TextField), findsNothing);
       expect(tester.widget<IconButton>(gpsButton).onPressed, isNull);
 
       await tester.pumpAndSettle();
@@ -190,9 +196,6 @@ void main() async {
   group('page tests', () {
     testWidgets('description', (tester) async {
       await tester.pumpWidget(createTestContainer());
-      final container = tester.container();
-
-      // final forecastListWidget = find.descendant(of: find.byType(ForecastList), matching: find.byType(List));
 
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
       expect(find.text('Current Weather'), findsNothing);
@@ -242,6 +245,7 @@ void main() async {
         find.textContaining('Sorry, your request timed out.'),
         findsOneWidget,
       );
+      expect(find.text('RETRY'), findsOneWidget);
     });
 
     testWidgets('fail and show not found', (tester) async {
@@ -368,6 +372,198 @@ void main() async {
 
       expect(
         find.textContaining('Location permissions are denied'),
+        findsOneWidget,
+      );
+    });
+  });
+
+  group('japanese exceptions', () {
+    MaterialApp createJpTestContainer() {
+      final container = MaterialApp(
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [Locale('en'), Locale('ja')],
+        locale: const Locale('ja'),
+        home: ProviderScope(
+          overrides: [
+            weatherRepositoryProvider.overrideWith(
+              (ref) => WeatherRepository(
+                MockLocale().languageCode,
+                MockRestClient(),
+              ),
+            ),
+            asyncWeatherProvider.overrideWithBuild(
+              (_, asyncWeather) => Future<WeatherResult>.value(
+                WeatherResult(
+                  currentWeatherData: CurrentWeather.dummy(),
+                  forecastData: ForecastData.dummy(),
+                ),
+              ),
+            ),
+          ],
+          child: const HomePage(),
+        ),
+      );
+
+      return container;
+    }
+
+    testWidgets('fail and show timeout error jp', (tester) async {
+      await tester.pumpWidget(createJpTestContainer());
+
+      final container = tester.container();
+
+      await tester.pumpAndSettle();
+
+      when(
+        container
+            .read(weatherRepositoryProvider)
+            .getLocalForecast(latitude: 1, longitude: 1),
+      ).thenThrow(
+        DioException(
+          requestOptions: RequestOptions(),
+          type: DioExceptionType.connectionTimeout,
+        ),
+      );
+
+      await tester.tap(find.byIcon(Icons.gps_fixed));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.textContaining('タイムアウトしました'),
+        findsOneWidget,
+      );
+      expect(find.text('リトライ'), findsOneWidget);
+    });
+
+    testWidgets('fail and show not found jp', (tester) async {
+      await tester.pumpWidget(createJpTestContainer());
+
+      final container = tester.container();
+
+      await tester.pumpAndSettle();
+
+      when(
+        container
+            .read(weatherRepositoryProvider)
+            .getLocalForecast(latitude: 1, longitude: 1),
+      ).thenThrow(
+        DioException(
+          requestOptions: RequestOptions(),
+          type: DioExceptionType.badResponse,
+          response: Response(
+            requestOptions: RequestOptions(),
+            statusCode: 404,
+          ),
+        ),
+      );
+
+      await tester.tap(find.byIcon(Icons.gps_fixed));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.textContaining('見つかりませんでした'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('location time out jp', (tester) async {
+      await tester.pumpWidget(createJpTestContainer());
+
+      final container = tester.container();
+
+      await tester.pumpAndSettle();
+
+      when(
+        container
+            .read(weatherRepositoryProvider)
+            .getLocalForecast(longitude: 1, latitude: 1),
+      ).thenThrow(TimeoutException(''));
+
+      await tester.tap(find.byIcon(Icons.gps_fixed));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.textContaining('タイムアウトしました'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('something went wrong jp', (tester) async {
+      await tester.pumpWidget(createJpTestContainer());
+
+      final container = tester.container();
+
+      await tester.pumpAndSettle();
+
+      when(
+        container
+            .read(weatherRepositoryProvider)
+            .getLocalForecast(longitude: 1, latitude: 1),
+      ).thenThrow(
+        DioException(
+          requestOptions: RequestOptions(),
+          type: DioExceptionType.badResponse,
+          response: Response(
+            requestOptions: RequestOptions(),
+            statusCode: 400,
+          ),
+        ),
+      );
+
+      await tester.tap(find.byIcon(Icons.gps_fixed));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.textContaining('ネットワークエラーが発生しました'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('location service disabled jp', (tester) async {
+      await tester.pumpWidget(createJpTestContainer());
+
+      final container = tester.container();
+
+      await tester.pumpAndSettle();
+
+      when(
+        container
+            .read(weatherRepositoryProvider)
+            .getLocalForecast(longitude: 1, latitude: 1),
+      ).thenThrow(const LocationServiceDisabledException());
+
+      await tester.tap(find.byIcon(Icons.gps_fixed));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.textContaining('位置情報サービスが無効です'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('location permission denied jp', (tester) async {
+      await tester.pumpWidget(createJpTestContainer());
+
+      final container = tester.container();
+
+      await tester.pumpAndSettle();
+
+      when(
+        container
+            .read(weatherRepositoryProvider)
+            .getLocalForecast(longitude: 1, latitude: 1),
+      ).thenThrow(const PermissionDeniedException(''));
+
+      await tester.tap(find.byIcon(Icons.gps_fixed));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.textContaining('位置情報の許可が拒否されました'),
         findsOneWidget,
       );
     });
