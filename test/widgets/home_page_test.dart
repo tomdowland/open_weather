@@ -14,6 +14,7 @@ import 'package:open_weather/models/current_weather.dart';
 import 'package:open_weather/models/forecast_data.dart';
 import 'package:open_weather/models/weather_result.dart';
 import 'package:open_weather/providers/async_weather.dart';
+import 'package:open_weather/providers/client_provider.dart';
 import 'package:open_weather/repositories/weather_repository.dart';
 import 'package:open_weather/services/retrofit.dart';
 import 'package:open_weather/ui/pages/home_page.dart';
@@ -73,6 +74,7 @@ void main() async {
   });
 
   MaterialApp createTestContainer() {
+    final mockRestClient = MockRestClient();
     final container = MaterialApp(
       localizationsDelegates: const [
         AppLocalizations.delegate,
@@ -85,8 +87,9 @@ void main() async {
         overrides: [
           weatherRepositoryProvider.overrideWith(
             (ref) =>
-                WeatherRepository(MockLocale().languageCode, MockRestClient()),
+                WeatherRepository(MockLocale().languageCode, mockRestClient),
           ),
+          restClientProvider.overrideWith((ref) => mockRestClient),
           asyncWeatherProvider.overrideWithBuild(
             (_, asyncWeather) => Future<WeatherResult>.value(
               WeatherResult(
@@ -194,7 +197,7 @@ void main() async {
   });
 
   group('page tests', () {
-    testWidgets('description', (tester) async {
+    testWidgets('startup', (tester) async {
       await tester.pumpWidget(createTestContainer());
 
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
@@ -216,6 +219,115 @@ void main() async {
             ?.length,
         40,
       );
+    });
+
+    testWidgets('city search', (tester) async {
+      await tester.pumpWidget(createTestContainer());
+      final container = tester.container();
+      await tester.pumpAndSettle();
+
+      final search = find.byIcon(Icons.search);
+      final textField = find.byType(TextField);
+
+      expect(search, findsOneWidget);
+      expect(textField, findsNothing);
+
+      await tester.tap(search);
+      await tester.pump();
+
+      expect(search, findsNothing);
+      expect(textField, findsOneWidget);
+
+      when(
+        container
+            .read(weatherRepositoryProvider)
+            .getLocalWeather(city: 'paris'),
+      ).thenAnswer((_) async {
+        await Future<void>.delayed(Duration.zero);
+        return Future<CurrentWeather>.value(CurrentWeather.dummy());
+      });
+      when(
+        container
+            .read(weatherRepositoryProvider)
+            .getLocalForecast(city: 'paris'),
+      ).thenAnswer((_) async {
+        await Future<void>.delayed(Duration.zero);
+        return Future<ForecastData>.value(ForecastData.dummy());
+      });
+
+      await tester.enterText(textField, 'paris');
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('Current Weather'), findsOneWidget);
+    });
+
+    testWidgets('city search, fail and retry', (tester) async {
+      await tester.pumpWidget(createTestContainer());
+      final container = tester.container();
+      await tester.pumpAndSettle();
+
+      final search = find.byIcon(Icons.search);
+      final textField = find.byType(TextField);
+
+      expect(search, findsOneWidget);
+      expect(textField, findsNothing);
+
+      await tester.tap(search);
+      await tester.pump();
+
+      expect(search, findsNothing);
+      expect(textField, findsOneWidget);
+
+      when(
+        container
+            .read(weatherRepositoryProvider)
+            .getLocalWeather(city: 'paris'),
+      ).thenThrow(
+        DioException(
+          requestOptions: RequestOptions(),
+          type: DioExceptionType.connectionTimeout,
+        ),
+      );
+      when(
+        container
+            .read(weatherRepositoryProvider)
+            .getLocalForecast(city: 'paris'),
+      ).thenThrow(
+        DioException(
+          requestOptions: RequestOptions(),
+          type: DioExceptionType.connectionTimeout,
+        ),
+      );
+
+      await tester.enterText(textField, 'paris');
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('Sorry, your request timed out.'), findsOneWidget);
+      expect(find.text('RETRY'), findsOneWidget);
+
+      when(
+        container
+            .read(weatherRepositoryProvider)
+            .getLocalWeather(city: 'paris'),
+      ).thenAnswer((_) async {
+        await Future<void>.delayed(Duration.zero);
+        return Future<CurrentWeather>.value(CurrentWeather.dummy());
+      });
+      when(
+        container
+            .read(weatherRepositoryProvider)
+            .getLocalForecast(city: 'paris'),
+      ).thenAnswer((_) async {
+        await Future<void>.delayed(Duration.zero);
+        return Future<ForecastData>.value(ForecastData.dummy());
+      });
+
+      await tester.tap(find.text('RETRY'));
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('Current Weather'), findsOneWidget);
     });
   });
 
