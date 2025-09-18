@@ -9,6 +9,9 @@ android {
     namespace = "com.example.open_weather"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = "29.0.13599879"
+    testOptions {
+        execution = "ANDROIDX_TEST_ORCHESTRATOR"
+    }
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -28,6 +31,13 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        testInstrumentationRunner = "pl.leancode.patrol.PatrolJUnitRunner"
+        testInstrumentationRunnerArguments["clearPackageData"] = "true"
+
+    }
+
+    dependencies {
+        androidTestUtil("androidx.test:orchestrator:1.5.1")
     }
 
     buildTypes {

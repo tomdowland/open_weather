@@ -59,12 +59,11 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  integration_test:
+    sdk: flutter
+  patrol: ^3.19.0
 
-  # The "flutter_lints" package below contains a set of recommended lints to
-  # encourage good coding practices. The lint set provided by the package is
-  # activated in the `analysis_options.yaml` file located at the root of your
-  # package. See that file for information about deactivating specific lint
-  # rules and activating additional ones.
+
   flutter_lints: ^6.0.0
   riverpod_generator: ^3.0.0-dev.17
   build_runner: ^2.4.15
@@ -78,6 +77,13 @@ dev_dependencies:
 # following page: https://dart.dev/tools/pub/pubspec
 
 # The following section is specific to Flutter packages.
+patrol:
+  app_name: Open Weather
+  android:
+    package_name: com.example.open_weather
+  ios:
+    package_name: com.example.open_weather
+
 flutter:
 
   # The following line ensures that the Material Icons font is
