@@ -9,8 +9,6 @@ import 'package:open_weather/ui/pages/settings_page.dart';
 void main() async {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-
-
   group('app tests', () {
     ProviderScope createContainer() {
       return const ProviderScope(

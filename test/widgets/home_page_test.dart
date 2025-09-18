@@ -304,7 +304,10 @@ void main() async {
       await tester.testTextInput.receiveAction(TextInputAction.done);
       await tester.pumpAndSettle();
 
-      expect(find.textContaining('Sorry, your request timed out.'), findsOneWidget);
+      expect(
+        find.textContaining('Sorry, your request timed out.'),
+        findsOneWidget,
+      );
       expect(find.text('RETRY'), findsOneWidget);
 
       when(
