@@ -1,7 +1,4 @@
-import 'dart:io';
-
 import 'package:alchemist/alchemist.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:open_weather/models/forecast_data.dart';

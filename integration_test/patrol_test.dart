@@ -10,12 +10,10 @@ import 'package:patrol/patrol.dart';
 
 // don't make main async, it breaks the whole thing
 void main() {
-
   patrolTest(
     'app starts up and shows a spinner while it attempts to load weather based on device location',
     framePolicy: LiveTestWidgetsFlutterBindingFramePolicy.fullyLive,
     ($) async {
-
       //required for api calls to work
       await dotenv.load();
 

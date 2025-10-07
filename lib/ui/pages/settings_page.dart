@@ -49,7 +49,7 @@ class SettingsPage extends ConsumerWidget {
                       const Spacer(),
                       Expanded(
                         child: DropdownButtonFormField<Locale>(
-                          value: locale.locale,
+                          initialValue: locale.locale,
                           isDense: false,
                           decoration: const InputDecoration.collapsed(
                             hintText: '',

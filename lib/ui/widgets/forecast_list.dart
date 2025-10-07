@@ -36,16 +36,18 @@ class ForecastList extends StatelessWidget {
                     SizedBox(
                       height: 45,
                       width: 45,
-                      child: item?.weather?[0].icon!=null?Image.network(
-                        'https://openweathermap.org/img/wn/${item?.weather?[0].icon}@2x.png',
-                        errorBuilder: (context, exception, stackTrace) =>
-                            const SizedBox(),
-                      ):const SizedBox(),
+                      child: item?.weather?[0].icon != null
+                          ? Image.network(
+                              'https://openweathermap.org/img/wn/${item?.weather?[0].icon}@2x.png',
+                              errorBuilder: (context, exception, stackTrace) =>
+                                  const SizedBox(),
+                            )
+                          : const SizedBox(),
                     ),
                     Text(
                       date.format(
                         DateTime.fromMillisecondsSinceEpoch(
-                          (item?.dt??0 + (forecastData.city?.timezone??0)) *
+                          (item?.dt ?? 0 + (forecastData.city?.timezone ?? 0)) *
                               1000,
                           isUtc: true,
                         ),
@@ -63,7 +65,7 @@ class ForecastList extends StatelessWidget {
                       textAlign: TextAlign.center,
                     ),
                     Text(
-                      '${(item?.main?.temp??0).toStringAsFixed(0)}°C',
+                      '${(item?.main?.temp ?? 0).toStringAsFixed(0)}°C',
                       style: const TextStyle(
                         fontSize: 16,
                       ),
