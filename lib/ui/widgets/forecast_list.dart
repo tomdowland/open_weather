@@ -13,9 +13,10 @@ class ForecastList extends StatelessWidget {
       children: [
         SizedBox(
           height: 176,
+          width: MediaQuery.maybeWidthOf(context),
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
-            itemCount: forecastData.weatherList?.length,
+            itemCount: forecastData.weatherList?.length ?? 40,
             itemBuilder: (_, __) {
               final item = forecastData.weatherList?[__];
               return Container(
@@ -35,16 +36,18 @@ class ForecastList extends StatelessWidget {
                     SizedBox(
                       height: 45,
                       width: 45,
-                      child: Image.network(
+                      child: item?.weather?[0].icon!=null?Image.network(
                         'https://openweathermap.org/img/wn/${item?.weather?[0].icon}@2x.png',
                         errorBuilder: (context, exception, stackTrace) =>
                             const SizedBox(),
-                      ),
+                      ):const SizedBox(),
                     ),
                     Text(
                       date.format(
                         DateTime.fromMillisecondsSinceEpoch(
-                          (item?.dt ?? 0) * 1000,
+                          (item?.dt??0 + (forecastData.city?.timezone??0)) *
+                              1000,
+                          isUtc: true,
                         ),
                       ),
                       style: const TextStyle(
@@ -60,7 +63,7 @@ class ForecastList extends StatelessWidget {
                       textAlign: TextAlign.center,
                     ),
                     Text(
-                      '${item?.main?.temp?.toStringAsFixed(0)}°C',
+                      '${(item?.main?.temp??0).toStringAsFixed(0)}°C',
                       style: const TextStyle(
                         fontSize: 16,
                       ),

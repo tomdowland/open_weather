@@ -21,18 +21,19 @@ class TodayWeather extends StatelessWidget {
           child: SizedBox(
             height: 150,
             width: 150,
-            child: Image.network(
+            child: weatherData.weather?[0].icon!=null?Image.network(
               'https://openweathermap.org/img/wn/${weatherData.weather?[0].icon}@2x.png',
               fit: BoxFit.fill,
               errorBuilder: (context, exception, stackTrace) =>
                   const SizedBox(),
-            ),
+            ):const SizedBox(),
           ),
         ),
         Text(
           date.format(
             DateTime.fromMillisecondsSinceEpoch(
-              (weatherData.dt ?? 0) * 1000,
+              (weatherData.dt??0 + (weatherData.timezone??0)) * 1000,
+              isUtc: true,
             ),
           ),
           style: const TextStyle(
